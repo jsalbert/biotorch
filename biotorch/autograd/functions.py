@@ -45,7 +45,7 @@ class Conv2dFA(autograd.Function):
         grad_input = grad_kernels = grad_kernels_fa = grad_bias = grad_bias_fa = None
 
         if context.needs_input_grad[0]:
-           grad_input = torch.nn.grad.conv2d_input(input.shape, kernels_fa, grad_output)
+            grad_input = torch.nn.grad.conv2d_input(input.shape, kernels_fa, grad_output)
 
         if context.needs_input_grad[1]:
             grad_kernels = torch.nn.grad.conv2d_weight(input, kernels_fa.shape, grad_output)
