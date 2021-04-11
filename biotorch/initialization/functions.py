@@ -23,15 +23,30 @@ def override_backward(layer):
     if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.ConvTranspose2d):
         def forward_conv(x):
             if layer.bias is None:
-                return Conv2dFA.apply(x, layer.weight, layer.weight_fa, None,
-                                      None, layer.stride, layer.padding)
+                return Conv2dFA.apply(x,
+                                      layer.weight,
+                                      layer.weight_fa,
+                                      None,
+                                      None,
+                                      layer.stride,
+                                      layer.padding,
+                                      layer.dilation,
+                                      layer.groups)
             else:
-                return Conv2dFA.apply(x, layer.weight, layer.weight_fa, layer.bias, layer.bias_fa, layer.stride, layer.padding)
+                return Conv2dFA.apply(x,
+                                      layer.weight,
+                                      layer.weight_fa,
+                                      layer.bias,
+                                      layer.bias_fa,
+                                      layer.stride,
+                                      layer.padding,
+                                      layer.dilation,
+                                      layer.groups)
         layer.forward = forward_conv
     elif isinstance(layer, nn.Linear):
         def forward_fc(x):
             if layer.bias is None:
                 return LinearFA.apply(x, layer.weight, layer.weight_fa, None)
             else:
-                return LinearFA.apply(x, layer.weight, layer.weight_fa, layer.bias)
+                return LinearFA.apply(x, layer.weight, layer.weight_fa, layer.bias, layer.bias_fa)
         layer.forward = forward_fc
