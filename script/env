@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+VENV_DIR=".venv"
+if [ -z $CI ]; then
+  if [ ! -d $VENV_DIR ]; then
+    virtualenv .venv -p python3
+  fi
+  source $VENV_DIR/bin/activate
+fi
