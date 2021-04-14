@@ -9,12 +9,12 @@ from biotorch.autograd.functions import LinearFA, Conv2dFA
 def add_fa_weight_matrices(layer):
     # fixed random weight and bias for FA backward pass do not need gradient
     if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.ConvTranspose2d) or isinstance(layer, nn.Linear):
-        layer.weight_fa = Variable(torch.Tensor(layer.weight.size()), requires_grad=False)
+        layer.weight_fa = nn.Parameter(torch.Tensor(layer.weight.size()), requires_grad=False)
         torch.nn.init.xavier_uniform_(layer.weight)
         torch.nn.init.xavier_uniform_(layer.weight_fa)
         layer.bias_fa = None
         if layer.bias is not None:
-            layer.bias_fa = Variable(torch.Tensor(layer.bias.size()), requires_grad=False)
+            layer.bias_fa = nn.Parameter(torch.Tensor(layer.bias.size()), requires_grad=False)
             torch.nn.init.constant_(layer.bias, 1)
             torch.nn.init.constant_(layer.bias_fa, 1)
 
