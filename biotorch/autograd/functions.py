@@ -1,6 +1,5 @@
-import pdb
-
 import torch
+
 
 from torch import autograd
 from torch.autograd import Variable
@@ -38,11 +37,12 @@ class LinearFA(autograd.Function):
 
 class Conv2dFA(autograd.Function):
     @staticmethod
-    def forward(context, input, kernels, kernels_fa, bias, bias_fa, stride, padding, dilation, groups):
+    def forward(context, input, weight, weight_fa, bias, bias_fa, stride, padding, dilation, groups):
         context.stride, context.padding, context.dilation, context.groups = stride, padding, dilation, groups
-        context.save_for_backward(input, kernels, kernels_fa, bias, bias_fa)
+        context.save_for_backward(input, weight, weight_fa, bias, bias_fa)
+        weight.to(input.device)
         output = torch.nn.functional.conv2d(input,
-                                            kernels,
+                                            weight,
                                             bias=bias,
                                             stride=stride,
                                             padding=padding,
@@ -52,12 +52,12 @@ class Conv2dFA(autograd.Function):
 
     @staticmethod
     def backward(context, grad_output):
-        input, kernels, kernels_fa, bias, bias_fa = context.saved_tensors
-        grad_input = grad_kernels = grad_kernels_fa = grad_bias = grad_bias_fa = None
+        input, weight, weight_fa, bias, bias_fa = context.saved_tensors
+        grad_input = grad_weight = grad_weight_fa = grad_bias = grad_bias_fa = None
 
         if context.needs_input_grad[0]:
            grad_input = torch.nn.grad.conv2d_input(input_size=input.shape,
-                                                   weight=kernels_fa,
+                                                   weight=weight_fa,
                                                    grad_output=grad_output,
                                                    stride=context.stride,
                                                    padding=context.padding,
@@ -65,17 +65,17 @@ class Conv2dFA(autograd.Function):
                                                    groups=context.groups)
 
         if context.needs_input_grad[1]:
-            grad_kernels = torch.nn.grad.conv2d_weight(input=input,
-                                                       weight_size=kernels_fa.shape,
-                                                       grad_output=grad_output,
-                                                       stride=context.stride,
-                                                       padding=context.padding,
-                                                       dilation=context.dilation,
-                                                       groups=context.groups)
+            grad_weight = torch.nn.grad.conv2d_weight(input=input,
+                                                      weight_size=weight_fa.shape,
+                                                      grad_output=grad_output,
+                                                      stride=context.stride,
+                                                      padding=context.padding,
+                                                      dilation=context.dilation,
+                                                      groups=context.groups)
 
         if bias is not None and context.needs_input_grad[3]:
             grad_bias = grad_output.sum(0).sum(2).sum(1)
 
         # add the input in the stride gradient which is useless
-        # return grad_input, grad_kernels, grad_kernels_fa, grad_bias, grad_bias_fa, input, None
-        return grad_input, grad_kernels, grad_kernels_fa, grad_bias, grad_bias_fa, None, None, None, None
+        # return grad_input, grad_weight, grad_weight_fa, grad_bias, grad_bias_fa, stride, padding, dilation, groups
+        return grad_input, grad_weight, grad_weight_fa, grad_bias, grad_bias_fa, None, None, None, None
