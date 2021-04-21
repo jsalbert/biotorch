@@ -1,2 +1,2 @@
-from .conv import Conv2d
-from .linear import Linear
+from .conv import Conv2dFA, Conv2dDFA
+from .linear import LinearFA, LinearDFA

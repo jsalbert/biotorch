@@ -1,7 +1,9 @@
+import torch.nn as nn
+
 from biotorch.layers import LinearFA, LinearDFA, Conv2dFA, Conv2dDFA
 
 
-def convert_layer(layer, mode, copy_weights):
+def convert_layer(layer, mode, copy_weights, output_dim=None):
     # Initialize variables
     layer_bias, bias_weight = False, None
     # Save original weights and biases
@@ -30,6 +32,7 @@ def convert_layer(layer, mode, copy_weights):
             new_layer = Conv2dDFA(
                 layer.in_channels,
                 layer.out_channels,
+                output_dim,
                 layer.kernel_size,
                 layer.stride,
                 layer.padding,
@@ -50,6 +53,7 @@ def convert_layer(layer, mode, copy_weights):
             new_layer = LinearDFA(
                 layer.in_features,
                 layer.out_features,
+                output_dim,
                 layer_bias,
             )
 
