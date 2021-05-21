@@ -1,2 +1,2 @@
-# biotorch
-PyTorch package to apply biological training methods
+# BioTorch
+PyTorch package specialized in biological training methods
