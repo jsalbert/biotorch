@@ -1,0 +1,22 @@
+# Experiment
+experiment:
+  name: "Exp"
+  output_dir: "trained_models"
+
+# Dataset
+dataset:
+  name: "mnist"
+
+# Model
+model:
+  architecture: "resnet18"
+  hyperparameters:
+    epochs: 32
+
+  optimizer:
+    'type': "RMSProp"
+    'lr': 0.001
+
+# Infrastructure
+infrastructure:
+  num_gpus: 1

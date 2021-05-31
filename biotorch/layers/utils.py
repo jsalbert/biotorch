@@ -1,6 +1,8 @@
 import torch.nn as nn
 
-from biotorch.layers import LinearFA, LinearDFA, Conv2dFA, Conv2dDFA
+import biotorch.layers.fa as fa_layers
+import biotorch.layers.dfa as dfa_layers
+import biotorch.layers.sign as sign_layers
 
 
 def convert_layer(layer, mode, copy_weights, output_dim=None):
@@ -17,7 +19,7 @@ def convert_layer(layer, mode, copy_weights, output_dim=None):
     new_layer = None
     if isinstance(layer, nn.Conv2d):
         if mode == 'FA':
-            new_layer = Conv2dFA(
+            new_layer = fa_layers.Conv2d(
                 layer.in_channels,
                 layer.out_channels,
                 layer.kernel_size,
@@ -29,10 +31,22 @@ def convert_layer(layer, mode, copy_weights, output_dim=None):
                 layer.padding_mode
             )
         elif mode == 'DFA':
-            new_layer = Conv2dDFA(
+            new_layer = dfa_layers.Conv2d(
                 layer.in_channels,
                 layer.out_channels,
                 output_dim,
+                layer.kernel_size,
+                layer.stride,
+                layer.padding,
+                layer.dilation,
+                layer.groups,
+                layer_bias,
+                layer.padding_mode
+            )
+        elif mode == 'sign':
+            new_layer = sign_layers.Conv2d(
+                layer.in_channels,
+                layer.out_channels,
                 layer.kernel_size,
                 layer.stride,
                 layer.padding,
@@ -44,16 +58,22 @@ def convert_layer(layer, mode, copy_weights, output_dim=None):
 
     elif isinstance(layer, nn.Linear):
         if mode == 'FA':
-            new_layer = LinearFA(
+            new_layer = fa_layers.Linear(
                 layer.in_features,
                 layer.out_features,
                 layer_bias,
             )
         elif mode == 'DFA':
-            new_layer = LinearDFA(
+            new_layer = dfa_layers.Linear(
                 layer.in_features,
                 layer.out_features,
                 output_dim,
+                layer_bias,
+            )
+        elif mode == 'sign':
+            new_layer = sign_layers.Linear(
+                layer.in_features,
+                layer.out_features,
                 layer_bias,
             )
 
