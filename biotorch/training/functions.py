@@ -19,7 +19,7 @@ def train(model,
     top1 = AverageMeter('Acc@1', ':6.2f')
     top5 = AverageMeter('Acc@5', ':6.2f')
     progress = ProgressMeter(
-        len(train_dataloader),
+        len(self.train_dataloader),
         [batch_time, data_time, losses, top1, top5],
         prefix="Epoch: [{}]".format(epoch))
 
@@ -50,9 +50,12 @@ def train(model,
         model.zero_grad()
         # Backward Pass
         loss.backward()
-        # Update wights
+        # Update weights
         optimizer.step()
 
+        if mode == 'weight_transport':
+            pass
+            # do something
         # Measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()

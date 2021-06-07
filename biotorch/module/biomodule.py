@@ -8,7 +8,7 @@ from biotorch.module.converter import ModuleConverter
 class BioModel(nn.Module):
     def __init__(self, model, mode='FA', copy_weights=False, output_dim=None):
         super(BioModel, self).__init__()
-        module_converter = ModuleConverter(mode)
+        self.model = model
         self.mode = mode
         self.output_dim = output_dim
         self.copy_weights = copy_weights
@@ -16,8 +16,9 @@ class BioModel(nn.Module):
         if self.mode == 'DFA':
             if self.output_dim is None:
                 raise ValueError('You need to introduce the `output_dim` of your model for DFA mode')
-
-        self.model = module_converter.convert(model, copy_weights, output_dim)
+        if mode != 'BP':
+            module_converter = ModuleConverter(mode=self.mode)
+            self.model = module_converter.convert(model, copy_weights, output_dim)
 
     def forward(self, x, targets=None, loss_function=None):
         output = self.model(x)

@@ -1,6 +1,6 @@
-# Experiment
+# Experiment Information
 experiment:
-  name: "Exp"
+  name: "MNIST Benchmark"
   output_dir: "trained_models"
 
 # Dataset
@@ -10,8 +10,16 @@ dataset:
 # Model
 model:
   architecture: "resnet18"
+  mode: "FA"
+  pretrained: false
+  # checkpoint:
+
+# Training Parameters
+training:
   hyperparameters:
-    epochs: 32
+    epochs: 10
+    batch_size: 32
+    image_size: 32
 
   optimizer:
     'type': "RMSProp"

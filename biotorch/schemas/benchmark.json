@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Biotorch Benchmarks Schema",
+  "title": "Biotorch Benchmark's Schema",
   "type": "object",
   "properties": {
     "experiment": {
@@ -41,190 +41,208 @@
         "num_gpus"
       ]
     }
+  },
+  "dataset": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      }
     },
-    "dataset": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "name"
+    "additionalProperties": false,
+    "required": [
+      "name"
+    ]
+  },
+  "training": {
+    "type": "object",
+    "properties": {
+      "hyperparameters": {
+        "type": "object",
+        "properties": {
+          "loss_function": {
+            "type": "string",
+            "default": "categorical_crossentropy"
+          },
+          "num_epochs": {
+            "type": "integer",
+            "default": 10
+          },
+          "batch_size": {
+            "type": "integer",
+            "default": 32
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "num_epochs"
         ]
+      },
+      "optimizer": {
+        "type": "object",
+        "properties": {
+          "SGD": {
+            "type": "object",
+            "properties": {
+              "lr": {
+                "type": "number",
+                "default": 0.001
+              },
+              "decay": {
+                "type": "number",
+                "default": 0.0
+              },
+              "momentum": {
+                "type": "number",
+                "default": 0.9
+              },
+              "gamma": {
+                "type": "number",
+                "default": 0.5
+              },
+              "scheduler_frequency": {
+                "type": "array",
+                "default": []
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "lr",
+              "decay",
+              "momentum"
+            ],
+            "default": {}
+          },
+          "Adam": {
+            "type": "object",
+            "properties": {
+              "lr": {
+                "type": "number",
+                "default": 0.01
+              },
+              "beta_1": {
+                "type": "number",
+                "default": 0.0
+              },
+              "beta_2": {
+                "type": "number",
+                "default": 0.0
+              },
+              "epsilon": {
+                "type": "number",
+                "default": 0.0
+              },
+              "decay": {
+                "type": "number",
+                "default": 0.0
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "lr",
+              "beta_1",
+              "beta_2",
+              "epsilon",
+              "decay"
+            ]
+          },
+          "RMSProp": {
+            "type": "object",
+            "properties": {
+              "lr": {
+                "type": "number",
+                "default": 0.01
+              },
+              "epsilon": {
+                "type": "number",
+                "default": 0.0
+              },
+              "decay": {
+                "type": "number",
+                "default": 0.0
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "lr",
+              "beta_1",
+              "beta_2",
+              "epsilon",
+              "decay"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "SGD"
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "Adam"
+            ]
+          }
+        ]
+      }
     },
-    "model": {
-      "type": "object",
-      "properties": {
-        "mode": {
-          "type": "string"
-        },
-        "architecture": {
-          "type": "string",
-          "enum": [
-            "alexnet",
-            "densenet121",
-            "densenet161",
-            "densenet169",
-            "densenet201",
-            "resnet101",
-            "resnet152",
-            "resnet18",
-            "resnet34",
-            "resnet50",
-            "squeezenet1_0",
-            "squeezenet1_1",
-            "vgg11",
-            "vgg11_bn",
-            "vgg13",
-            "vgg13_bn",
-            "vgg16",
-            "vgg16_bn",
-            "vgg19",
-            "vgg19_bn"
-          ]
-        },
-        "custom_model": {
-          "type": "string"
-        },
-        "hyperparameters": {
-          "type": "object",
-          "properties": {
-            "loss_function": {
-              "type": "string",
-              "default": "categorical_crossentropy"
-            },
-            "num_epochs": {
-              "type": "integer",
-              "default": 10
-            },
-            "batch_size": {
-              "type": "integer",
-              "default": 32
-            }
-          },
-          "additionalProperties": false,
-          "required": [
-            "num_epochs"
-          ]
-        },
-        "optimizer": {
-          "type": "object",
-          "properties": {
-            "SGD": {
-              "type": "object",
-              "properties": {
-                "lr": {
-                  "type": "number",
-                  "default": 0.001
-                },
-                "decay": {
-                  "type": "number",
-                  "default": 0.0
-                },
-                "momentum": {
-                  "type": "number",
-                  "default": 0.9
-                },
-                "gamma": {
-                  "type": "number",
-                  "default": 0.5
-                },
-                "scheduler_frequency": {
-                  "type": "array",
-                  "default": []
-                }
-              },
-              "additionalProperties": false,
-              "required": [
-                "lr",
-                "decay",
-                "momentum"
-              ],
-              "default": {}
-            },
-            "Adam": {
-              "type": "object",
-              "properties": {
-                "lr": {
-                  "type": "number",
-                  "default": 0.01
-                },
-                "beta_1": {
-                  "type": "number",
-                  "default": 0.0
-                },
-                "beta_2": {
-                  "type": "number",
-                  "default": 0.0
-                },
-                "epsilon": {
-                  "type": "number",
-                  "default": 0.0
-                },
-                "decay": {
-                  "type": "number",
-                  "default": 0.0
-                }
-              },
-              "additionalProperties": false,
-              "required": [
-                "lr",
-                "beta_1",
-                "beta_2",
-                "epsilon",
-                "decay"
-              ]
-            },
-            "RMSProp": {
-              "type": "object",
-              "properties": {
-                "lr": {
-                  "type": "number",
-                  "default": 0.01
-                },
-                "epsilon": {
-                  "type": "number",
-                  "default": 0.0
-                },
-                "decay": {
-                  "type": "number",
-                  "default": 0.0
-                }
-              },
-              "additionalProperties": false,
-              "required": [
-                "lr",
-                "beta_1",
-                "beta_2",
-                "epsilon",
-                "decay"
-              ]
-            }
-          },
-          "additionalProperties": false,
-          "oneOf": [
-            {
-              "type": "object",
-              "required": [
-                "SGD"
-              ]
-            },
-            {
-              "type": "object",
-              "required": [
-                "Adam"
-              ]
-            }
-          ]
-        }
+    "additionalProperties": false,
+    "required": [
+      "hyperparameters"
+    ]
+  },
+  "model": {
+    "type": "object",
+    "properties": {
+      "mode": {
+        "type": "string",
+        "enum": [
+          "BP",
+          "FA",
+          "DFA",
+          "sign"
+        ]
+      },
+      "pretrained": {
+        "type": "boolean",
+        "default": false
+      },
+      "architecture": {
+        "type": "string",
+        "enum": [
+          "alexnet",
+          "densenet121",
+          "densenet161",
+          "densenet169",
+          "densenet201",
+          "resnet101",
+          "resnet152",
+          "resnet18",
+          "resnet34",
+          "resnet50",
+          "squeezenet1_0",
+          "squeezenet1_1",
+          "vgg11",
+          "vgg11_bn",
+          "vgg13",
+          "vgg13_bn",
+          "vgg16",
+          "vgg16_bn",
+          "vgg19",
+          "vgg19_bn"
+        ]
+      },
+      "model_checkpoint": {
+        "type": "string"
       },
       "additionalProperties": false,
       "oneOf": [
         {
           "required": [
-            "custom_model"
+            "model_checkpoint"
           ]
         },
         {
@@ -232,16 +250,16 @@
             "architecture"
           ]
         }
-      ],
-      "required": [
-        "hyperparameters"
       ]
     },
-  "additionalProperties": false,
-  "required": [
-    "experiment",
-    "infrastructure",
-    "model",
-    "dataset"
-  ]
+    "additionalProperties": false,
+    "required": [
+      "experiment",
+      "infrastructure",
+      "training",
+      "model",
+      "dataset"
+    ]
+  }
 }
+

@@ -1,13 +1,14 @@
+import os
+import json
+import yaml
+
 from jsonschema import validators, Draft7Validator
 
 
 def read_yaml(yaml_path):
-    try:
-        with open(yaml_path, 'r') as f:
-            yaml_file = yaml.load(f, Loader=yaml.Loader)
-        return yaml_file
-    except FileNotFoundError:
-        pass
+    with open(yaml_path, 'r') as f:
+        yaml_file = yaml.load(f, Loader=yaml.Loader)
+    return yaml_file
 
 
 def read_schema(schema_name):
