@@ -1,6 +1,8 @@
 # BioTorch
-BioTorch is a PyTorch framework specialized in biologically plausible learning algorithms
 
+<h3 align="center">
+    <p>BioTorch is a PyTorch framework specialized in biologically plausible learning algorithms</p>
+</h3>
 
 🧠 Provides implementations of layers, models and biologically plausible learning algorithms. Its aim is to build a model hub with the state-of-the-art models and methods in the field.
 
