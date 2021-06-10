@@ -1,4 +1,6 @@
-# BioTorch
+<h3 align="center">
+<img width="559" alt="BioTorch" src="https://user-images.githubusercontent.com/17982112/121539308-dad56f00-ca05-11eb-8cda-1752c2f304cd.png">
+</h3>
 
 <h3 align="center">
     <p>BioTorch is a PyTorch framework specialized in biologically plausible learning algorithms</p>
