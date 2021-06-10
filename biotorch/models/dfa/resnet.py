@@ -1,7 +1,8 @@
 import torchvision.models as models
 
 from torchvision.models.resnet import ResNet
-from biotorch.module.biomodule import BioModule
+from biotorch.models.utils import create_resnet_biomodel
+
 
 MODE = 'dfa'
 MODE_STRING = 'Direct Feedback Alignment'
@@ -17,8 +18,7 @@ def resnet18(pretrained: bool = False, progress: bool = True, num_classes: int =
         num_classes (int): Output dimension of the last linear layer
     """
     print('Converting ResNet-18 to {} mode'.format(MODE_STRING))
-    return BioModule(models.resnet18(pretrained, progress, num_classes=num_classes),
-                     mode=MODE, output_dim=num_classes)
+    return create_resnet_biomodel(models.resnet18, MODE, pretrained, progress, num_classes)
 
 
 def resnet34(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:
@@ -31,8 +31,7 @@ def resnet34(pretrained: bool = False, progress: bool = True, num_classes: int =
         num_classes (int): Output dimension of the last linear layer
     """
     print('Converting ResNet-34 to {} mode'.format(MODE_STRING))
-    return BioModule(models.resnet34(pretrained, progress, num_classes=num_classes),
-                     mode=MODE, output_dim=num_classes)
+    return create_resnet_biomodel(models.resnet34, MODE, pretrained, progress, num_classes)
 
 
 def resnet50(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:
@@ -45,8 +44,7 @@ def resnet50(pretrained: bool = False, progress: bool = True, num_classes: int =
         num_classes (int): Output dimension of the last linear layer
     """
     print('Converting ResNet-50 to {} mode'.format(MODE_STRING))
-    return BioModule(models.resnet50(pretrained, progress, num_classes=num_classes),
-                     mode=MODE, output_dim=num_classes)
+    return create_resnet_biomodel(models.resnet50, MODE, pretrained, progress, num_classes)
 
 
 def resnet101(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:
@@ -59,8 +57,7 @@ def resnet101(pretrained: bool = False, progress: bool = True, num_classes: int 
         num_classes (int): Output dimension of the last linear layer
     """
     print('Converting ResNet-101 to {} mode'.format(MODE_STRING))
-    return BioModule(models.resnet101(pretrained, progress, num_classes=num_classes),
-                     mode=MODE, output_dim=num_classes)
+    return create_resnet_biomodel(models.resnet101, MODE, pretrained, progress, num_classes)
 
 
 def resnet152(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:
@@ -73,8 +70,7 @@ def resnet152(pretrained: bool = False, progress: bool = True, num_classes: int 
         num_classes (int): Output dimension of the last linear layer
     """
     print('Converting ResNet-152 to {} mode'.format(MODE_STRING))
-    return BioModule(models.resnet152(pretrained, progress, num_classes=num_classes),
-                     mode=MODE, output_dim=num_classes)
+    return create_resnet_biomodel(models.resnet152, MODE, pretrained, progress, num_classes)
 
 
 def resnext50_32x4d(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:
@@ -88,8 +84,7 @@ def resnext50_32x4d(pretrained: bool = False, progress: bool = True, num_classes
     """
 
     print('Converting ResNext-50 32x4d to {} mode'.format(MODE_STRING))
-    return BioModule(models.resnext50_32x4d(pretrained, progress, num_classes=num_classes),
-                     mode=MODE, output_dim=num_classes)
+    return create_resnet_biomodel(models.resnext50_32x4d, MODE, pretrained, progress, num_classes)
 
 
 def resnext101_32x8d(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:
@@ -102,8 +97,7 @@ def resnext101_32x8d(pretrained: bool = False, progress: bool = True, num_classe
         num_classes (int): Output dimension of the last linear layer
     """
     print('Converting ResNext-101 32x8d to {} mode'.format(MODE_STRING))
-    return BioModule(models.resnext101_32x8d(pretrained, progress, num_classes=num_classes),
-                     mode=MODE, output_dim=num_classes)
+    return create_resnet_biomodel(models.resnext101_32x8d, MODE, pretrained, progress, num_classes)
 
 
 def wide_resnet50_2(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:
@@ -121,8 +115,7 @@ def wide_resnet50_2(pretrained: bool = False, progress: bool = True, num_classes
         num_classes (int): Output dimension of the last linear layer
     """
     print('Converting Wide ResNet-50-2 to {} mode'.format(MODE_STRING))
-    return BioModule(models.wide_resnet50_2(pretrained, progress, num_classes=num_classes),
-                     mode=MODE, output_dim=num_classes)
+    return create_resnet_biomodel(models.wide_resnet50_2, MODE, pretrained, progress, num_classes)
 
 
 def wide_resnet101_2(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:
@@ -140,5 +133,4 @@ def wide_resnet101_2(pretrained: bool = False, progress: bool = True, num_classe
         num_classes (int): Output dimension of the last linear layer
     """
     print('Converting Wide ResNet-101-2 to {} mode'.format(MODE_STRING))
-    return BioModule(models.wide_resnet101_2(pretrained, progress, num_classes=num_classes),
-                     mode=MODE, output_dim=num_classes)
+    return create_resnet_biomodel(models.wide_resnet101_2, MODE, pretrained, progress, num_classes)

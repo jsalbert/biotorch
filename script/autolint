@@ -2,4 +2,4 @@
 . script/env
 set -xe
 autopep8 --in-place --recursive --max-line-length 1000 --aggressive tests biotorch
-autoflake --in-place --remove-unused-variables --remove-all-unused-imports --recursive tests biotorch
+autoflake --in-place --remove-unused-variables --recursive tests biotorch

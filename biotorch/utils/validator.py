@@ -1,6 +1,5 @@
 import os
 import json
-import yaml
 
 from jsonschema import validators, Draft7Validator
 

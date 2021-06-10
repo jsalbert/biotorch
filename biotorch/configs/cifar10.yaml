@@ -1,11 +1,11 @@
 # Experiment Information
 experiment:
-  name: "MNIST Benchmark"
+  name: "CIFAR10 Benchmark"
   output_dir: "trained_models"
 
 # Dataset
 dataset:
-  name: "mnist"
+  name: "cifar10"
 
 # Model
 model:
@@ -19,7 +19,7 @@ training:
   hyperparameters:
     epochs: 10
     batch_size: 32
-    image_size: 32
+    target_size: 224
 
   optimizer:
     'type': "RMSProp"

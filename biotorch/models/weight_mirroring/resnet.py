@@ -5,7 +5,6 @@ import torch.nn as nn
 from torch import Tensor
 from torch.nn.functional import interpolate
 from torchvision.models.resnet import ResNet
-from biotorch.module.biomodule import BioModule
 from biotorch.layers.weight_mirroring import Conv2d, Linear
 from typing import Type, Any, Callable, Union, List, Optional
 from torchvision.models.utils import load_state_dict_from_url
@@ -112,7 +111,7 @@ class BasicBlock(nn.Module):
         # Update the backward weight matrix (FA Matrix)
         dB = mirror_learning_rate * F.conv2d(torch.transpose(x, 0, 1), torch.transpose(y, 0, 1), stride=[1, 1], padding=1)
 
-        weight_update =  torch.matmul(input_noise, output_noise.T)
+        weight_update = torch.matmul(input_noise, output_noise.T)
         self.conv1.update_B(weight_update, damping_factor)
 
         input_noise = noise_amplitude * (torch.randn(output_noise.size()))

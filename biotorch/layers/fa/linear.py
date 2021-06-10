@@ -1,5 +1,4 @@
 import torch
-import math
 import torch.nn as nn
 
 from biotorch.layers.metrics import compute_angle
@@ -17,14 +16,14 @@ class Linear(nn.Linear):
             self.bias_backward = nn.Parameter(torch.Tensor(self.bias.size()), requires_grad=False)
             nn.init.constant_(self.bias, 1)
             nn.init.constant_(self.bias_backward, 1)
-        self.register_backward_hook(self.angle_hook)
+        # self.register_backward_hook(self.angle_hook)
 
     def forward(self, x):
         # Linear Feedback Alignment Backward
         return LinearGrad.apply(x, self.weight, self.weight_backward, self.bias, self.bias_backward)
 
-    @staticmethod
-    def angle_hook(module, grad_input, grad_output):
-        module.weight_angle = compute_angle(module.weight, module.weight_backward)
-        print(module, module.weight_angle)
-        return grad_output
+    # @staticmethod
+    # def angle_hook(module, grad_input, grad_output):
+    #     module.weight_angle = compute_angle(module.weight, module.weight_backward)
+    #     print(module, module.weight_angle)
+    #     return grad_output

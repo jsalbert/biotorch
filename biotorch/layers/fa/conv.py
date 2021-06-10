@@ -32,7 +32,7 @@ class Conv2d(nn.Conv2d):
             bias,
             padding_mode
         )
-        
+
         nn.init.xavier_uniform_(self.weight)
         self.weight_backward = nn.Parameter(torch.Tensor(self.weight.size()), requires_grad=False)
         nn.init.xavier_uniform_(self.weight_backward)
@@ -42,7 +42,7 @@ class Conv2d(nn.Conv2d):
             nn.init.constant_(self.bias, 1)
             nn.init.constant_(self.bias_backward, 1)
 
-        self.register_backward_hook(self.angle_hook)
+        # self.register_backward_hook(self.angle_hook)
 
     def forward(self, x):
         # Linear Feedback Alignment Backward
@@ -56,8 +56,8 @@ class Conv2d(nn.Conv2d):
                                 self.dilation,
                                 self.groups)
 
-    @staticmethod
-    def angle_hook(module, grad_input, grad_output):
-        module.weight_angle = compute_angle(module.weight, module.weight_backward)
-        print(module, module.weight_angle)
-        return grad_output
+    # @staticmethod
+    # def angle_hook(module, grad_input, grad_output):
+    #     module.weight_angle = compute_angle(module.weight, module.weight_backward)
+    #     print(module, module.weight_angle)
+    #     return grad_output

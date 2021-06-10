@@ -6,13 +6,13 @@ import torch.backends.cudnn as cudnn
 
 from types import ModuleType
 import biotorch.models as models
-from biotorch.datasets.cifar import CIFAR10_Dataset
+from biotorch.datasets.selector import DatasetSelector
 from biotorch.training.trainer import Trainer
 from biotorch.utils.validator import validate_config
 from biotorch.utils.utils import read_yaml, mkdir
 
 
-DATASETS_AVAILABLE = ['mnist', 'cifar10']
+DATASETS_AVAILABLE = ['mnist', 'cifar10', 'cifar100']
 
 
 class Benchmark:
@@ -57,24 +57,26 @@ class Benchmark:
         self.best_acc = 0  # best test accuracy
         self.epochs = self.hyperparameters['epochs']
         self.batch_size = self.hyperparameters['batch_size']
+        self.target_size = self.hyperparameters['target_size']
 
         # Create dataset
         if self.dataset_config['name'] in self.dataset_names:
-            self.dataset = CIFAR10_Dataset()
-            self.n_classes = 10
+            self.dataset_creator = DatasetSelector(self.dataset_config['name']).get_dataset()
+            self.dataset = self.dataset_creator(self.target_size)
             self.train_dataloader = self.dataset.create_train_dataloader(self.batch_size)
             self.test_dataloader = self.dataset.create_test_dataloader(self.batch_size)
-
-        self.output_dim = self.n_classes
+            self.num_classes = self.dataset.num_classes
 
         # Create model
         if self.model_config['architecture'] is not None and self.model_config['architecture'] in self.model_names:
             if self.model_config['pretrained']:
                 print("=> Using pre-trained model '{}'".format(self.model_config['architecture']))
-                self.model = models.__dict__[self.model_config['mode']].__dict__[self.model_config['architecture']](pretrained=True)
+                self.model = models.__dict__[self.model_config['mode']].__dict__[
+                    self.model_config['architecture']](pretrained=True, )
             else:
-                print("=> Creating model '{}'".format(self.model_config['architecture']))
-                self.model = models.__dict__[self.model_config['mode']].__dict__[self.model_config['architecture']]()
+                print("=> Creating model from sratch'{}'".format(self.model_config['architecture']))
+                self.model = models.__dict__[self.model_config['mode']].__dict__[
+                    self.model_config['architecture']]()
 
         elif self.model_config['checkpoint'] is not None:
             self.model = torch.load(self.model_config['checkpoint'])

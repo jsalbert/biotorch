@@ -1,4 +1,3 @@
-import time
 import torch
 from biotorch.training.functions import train, test
 
