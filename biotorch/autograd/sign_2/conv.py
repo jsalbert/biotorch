@@ -2,8 +2,16 @@ import torch
 
 from torch import autograd
 
+"""
+Method from How Important Is Weight Symmetry in Backpropagation? (https://arxiv.org/pdf/1510.05067.pdf)
 
-# Regular Back-Propagation computing the gradients with the weight sign
+Batchwise Random Magnitude Sign-concordant Feedbacks (brSF):
+V = M ◦ sign(W), where M is redrawn after each update of W (i.e., each mini-batch).
+
+"""
+
+
+# Regular Back-Propagation computing the gradients with the sign of the forward weight matrix
 class Conv2dGrad(autograd.Function):
     @staticmethod
     def forward(context, input, weight, bias, stride, padding, dilation, groups):
@@ -23,11 +31,12 @@ class Conv2dGrad(autograd.Function):
         input, weight, bias = context.saved_tensors
         grad_input = grad_weight = grad_bias = None
 
+        weight_backward = torch.Tensor(weight.size(), requires_grad=False)
         # Gradient input
         if context.needs_input_grad[0]:
             # We use the sign of the weights to compute the gradients
             grad_input = torch.nn.grad.conv2d_input(input_size=input.shape,
-                                                    weight=torch.sign(weight),
+                                                    weight=torch.sign(weight) * weight_backward,
                                                     grad_output=grad_output,
                                                     stride=context.stride,
                                                     padding=context.padding,

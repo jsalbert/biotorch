@@ -236,7 +236,8 @@
         ]
       },
       "model_checkpoint": {
-        "type": "string"
+        "type": "string",
+        "default": null
       },
       "additionalProperties": false,
       "oneOf": [

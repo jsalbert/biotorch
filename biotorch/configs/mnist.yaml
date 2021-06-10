@@ -10,7 +10,7 @@ dataset:
 # Model
 model:
   architecture: "resnet18"
-  mode: "FA"
+  mode: "fa"
   pretrained: false
   # checkpoint:
 

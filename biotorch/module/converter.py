@@ -3,10 +3,10 @@ from biotorch.layers.utils import convert_layer
 
 
 class ModuleConverter:
-    def __init__(self, mode='FA'):
+    def __init__(self, mode='fa'):
         self.mode = mode
 
-    def convert(self, module, copy_weights=False, output_dim=None):
+    def convert(self, module, copy_weights=True, output_dim=None):
         # Compute original model layer counts
         layer_counts = self.count_layers(module)
         # Replace layers

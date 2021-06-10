@@ -1,10 +1,9 @@
-import torch
 import torch.nn as nn
 
 
-from biotorch.autograd.fa.conv import Conv2dGrad
-from torch.nn.common_types import _size_2_t
 from typing import Union
+from torch.nn.common_types import _size_2_t
+from biotorch.autograd.sign_2.conv import Conv2dGrad
 
 
 class Conv2d(nn.Conv2d):
@@ -33,22 +32,16 @@ class Conv2d(nn.Conv2d):
             padding_mode
         )
 
-        self.weight_fa = nn.Parameter(torch.Tensor(self.weight.size()), requires_grad=False)
         nn.init.xavier_uniform_(self.weight)
-        nn.init.xavier_uniform_(self.weight_fa)
         self.bias_fa = None
         if self.bias is not None:
-            self.bias_fa = nn.Parameter(torch.Tensor(self.bias.size()), requires_grad=False)
             nn.init.constant_(self.bias, 1)
-            nn.init.constant_(self.bias_fa, 1)
 
     def forward(self, x):
-        # Linear Feedback Alignment Backward
+        # Sign Weight Transport Backward
         return Conv2dGrad.apply(x,
                                 self.weight,
-                                self.weight_fa,
                                 self.bias,
-                                self.bias_fa,
                                 self.stride,
                                 self.padding,
                                 self.dilation,

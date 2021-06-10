@@ -1,10 +1,10 @@
 import torch
 import torch.nn as nn
 
+
 from typing import Union
 from torch.nn.common_types import _size_2_t
-from biotorch.autograd.fa.conv import Conv2dGrad
-from biotorch.layers.metrics import compute_angle
+from biotorch.autograd.sign_3.conv import Conv2dGrad
 
 
 class Conv2d(nn.Conv2d):
@@ -32,7 +32,7 @@ class Conv2d(nn.Conv2d):
             bias,
             padding_mode
         )
-        
+
         nn.init.xavier_uniform_(self.weight)
         self.weight_backward = nn.Parameter(torch.Tensor(self.weight.size()), requires_grad=False)
         nn.init.xavier_uniform_(self.weight_backward)
@@ -42,10 +42,8 @@ class Conv2d(nn.Conv2d):
             nn.init.constant_(self.bias, 1)
             nn.init.constant_(self.bias_backward, 1)
 
-        self.register_backward_hook(self.angle_hook)
-
     def forward(self, x):
-        # Linear Feedback Alignment Backward
+        # Sign Weight Transport Backward
         return Conv2dGrad.apply(x,
                                 self.weight,
                                 self.weight_backward,
@@ -55,9 +53,3 @@ class Conv2d(nn.Conv2d):
                                 self.padding,
                                 self.dilation,
                                 self.groups)
-
-    @staticmethod
-    def angle_hook(module, grad_input, grad_output):
-        module.weight_angle = compute_angle(module.weight, module.weight_backward)
-        print(module, module.weight_angle)
-        return grad_output

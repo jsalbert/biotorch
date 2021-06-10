@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from biotorch.autograd.sign.linear import LinearGrad
+from biotorch.autograd.sign_2.linear import LinearGrad
 
 
 class Linear(nn.Linear):

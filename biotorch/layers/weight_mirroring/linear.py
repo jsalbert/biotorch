@@ -19,3 +19,11 @@ class Linear(nn.Linear):
     def forward(self, x):
         # Linear Feedback Alignment Backward
         return LinearGrad.apply(x, self.weight, self.weight_fa, self.bias, self.bias_fa)
+
+    def update_B(self, weight_update, damping_factor=0.5):
+        self.weight_fa += weight_update
+        # Prevent feedback weights growing too large
+        x = torch.randn(self.weight_fa.size())
+        y = torch.matmul(self.weight_fa, x)
+        y_std = torch.mean(np.std(y, axis=0))
+        self.weight_fa = damping_factor * self.weight_fa / y_std
