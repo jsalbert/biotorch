@@ -1,5 +1,5 @@
 <h3 align="center">
-<img width="559" alt="BioTorch" src="https://user-images.githubusercontent.com/17982112/121539308-dad56f00-ca05-11eb-8cda-1752c2f304cd.png">
+    <img width="580" alt="BioTorch" src="https://user-images.githubusercontent.com/17982112/121555300-2e01ee80-ca13-11eb-878d-a0f7e8b20401.png">
 </h3>
 
 <h3 align="center">
