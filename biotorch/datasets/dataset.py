@@ -34,11 +34,16 @@ class Dataset(object):
     def _create_dataloader(self, mode, batch_size, shuffle=True, drop_last=True):
         if mode == 'train':
             return DataLoader(self.train_dataset, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last)
+        elif mode == 'val':
+            return DataLoader(self.val_dataset, batch_size=batch_size, shuffle=False, drop_last=False)
         elif mode == 'test':
             return DataLoader(self.test_dataset, batch_size=batch_size, shuffle=False, drop_last=False)
 
     def create_train_dataloader(self, batch_size):
         return self._create_dataloader('train', batch_size)
+
+    def create_val_dataloader(self, batch_size):
+        return self._create_dataloader('val', batch_size)
 
     def create_test_dataloader(self, batch_size):
         return self._create_dataloader('test', batch_size)

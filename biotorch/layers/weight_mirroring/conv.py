@@ -47,8 +47,8 @@ class Conv2d(nn.Conv2d):
         # Prevent feedback weights growing too large
         x = torch.randn(self.weight_backward.size())
         y = torch.matmul(self.weight_backward, x)
-        y_std = torch.mean(np.std(y, axis=0))
-        self.weight_backward = damping_factor * self.weight_backward / y_std
+        y_std = torch.mean(torch.std(y, axis=0))
+        self.weight_backward = nn.Parameter(damping_factor * self.weight_backward / y_std, requires_grad=False)
 
     def forward(self, x):
         # Linear Feedback Alignment Backward

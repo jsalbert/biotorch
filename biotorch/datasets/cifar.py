@@ -26,7 +26,7 @@ class CIFAR100(Dataset):
             transform=transforms.Compose(self.train_transforms)
         )
 
-        self.test_dataset = datasets.CIFAR100(self.dataset_path,
+        self.val_dataset = datasets.CIFAR100(self.dataset_path,
                                               train=False,
                                               download=True,
                                               transform=transforms.Compose(self.test_transforms)
@@ -58,7 +58,7 @@ class CIFAR10(Dataset):
             transform=transforms.Compose(self.train_transforms)
         )
 
-        self.test_dataset = datasets.CIFAR10(
+        self.val_dataset = datasets.CIFAR10(
             self.dataset_path,
             train=False,
             download=True,

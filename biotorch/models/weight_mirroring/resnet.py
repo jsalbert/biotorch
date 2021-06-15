@@ -3,9 +3,10 @@ import torch.nn as nn
 
 
 from torch import Tensor
+import torch.nn.functional as F
 from torch.nn.functional import interpolate
 from torchvision.models.resnet import ResNet
-from biotorch.layers.weight_mirroring import Conv2d, Linear
+from biotorch.layers.weight_mirroring import Conv2d, Linear, Sequential
 from typing import Type, Any, Callable, Union, List, Optional
 from torchvision.models.utils import load_state_dict_from_url
 
@@ -97,25 +98,35 @@ class BasicBlock(nn.Module):
                        noise_amplitude: float = 0.1,
                        damping_factor: float = 0.5):
 
-        import pdb
-        pdb.set_trace()
         # Create input noise with the dimensions of the input
-        input_noise_0 = self.noise_amplitude * (torch.randn(x.size()))
-        input_noise = input_noise_0
+        input_noise_0 = noise_amplitude * (torch.randn(x.size()))
         identity = input_noise_0
 
-        output_noise = self.conv1(input_noise)
+        output_noise = self.conv1(input_noise_0)
+        # Compute change and update the backward weight matrix (FA Matrix)
+        dW = mirror_learning_rate * F.conv2d(torch.transpose(input_noise_0, 0, 1),
+                                             torch.transpose(output_noise, 0, 1),
+                                             dilation=self.conv1.stride,
+                                             padding=self.conv1.padding)
+        dB = torch.transpose(F.interpolate(dW,
+                                           size=[self.conv1.weight.shape[2], self.conv1.weight.shape[3]]), 0, 1)
+        self.conv1.update_B(torch.nn.Parameter(dB), damping_factor)
+
         output_noise = self.bn1(output_noise)
         output_noise = self.relu(output_noise)
 
-        # Update the backward weight matrix (FA Matrix)
-        dB = mirror_learning_rate * F.conv2d(torch.transpose(x, 0, 1), torch.transpose(y, 0, 1), stride=[1, 1], padding=1)
-
-        weight_update = torch.matmul(input_noise, output_noise.T)
-        self.conv1.update_B(weight_update, damping_factor)
-
         input_noise = noise_amplitude * (torch.randn(output_noise.size()))
+
         output_noise = self.conv2(input_noise)
+        # Compute change and update the backward weight matrix (FA Matrix)
+        dW = mirror_learning_rate * F.conv2d(torch.transpose(input_noise, 0, 1),
+                                             torch.transpose(output_noise, 0, 1),
+                                             dilation=self.conv2.stride,
+                                             padding=self.conv2.padding)
+        dB = torch.transpose(F.interpolate(dW,
+                                           size=[self.conv2.weight.shape[2], self.conv2.weight.shape[3]]), 0, 1)
+        self.conv2.update_B(torch.nn.Parameter(dB), damping_factor)
+
         output_noise = self.bn2(output_noise)
 
         if self.downsample is not None:
@@ -124,9 +135,7 @@ class BasicBlock(nn.Module):
         output_noise += identity
         output_noise = self.relu2(output_noise)
 
-        # Update the backward weight matrix (FA Matrix)
-        weight_update = mirror_learning_rate * torch.matmul(input_noise, output_noise.T)
-        self.conv2.update_B(weight_update, damping_factor)
+        return output_noise
 
 
 class Bottleneck(nn.Module):
@@ -199,28 +208,48 @@ class Bottleneck(nn.Module):
         identity = input_noise_0
 
         output_noise = self.conv1(input_noise_0)
+
+        # Compute change and update the backward weight matrix (FA Matrix)
+        dW = mirror_learning_rate * F.conv2d(torch.transpose(input_noise, 0, 1),
+                                             torch.transpose(output_noise, 0, 1),
+                                             dilation=self.conv1.stride,
+                                             padding=self.conv1.padding)
+        dB = torch.transpose(F.interpolate(dW,
+                                           size=[self.conv1.weight.shape[2], self.conv1.weight.shape[3]]), 0, 1)
+        self.conv1.update_B(torch.nn.Parameter(dB), damping_factor)
+
         output_noise = self.bn1(output_noise)
         output_noise = self.relu(output_noise)
-
-        # Update the backward weight matrix (FA Matrix)
-        weight_update = mirror_learning_rate * torch.matmul(input_noise, output_noise.T)
-        self.conv1.update_B(weight_update, damping_factor)
 
         # Create input noise with the dimensions of the input
         input_noise = noise_amplitude * (torch.randn(output_noise.size()))
 
         output_noise = self.conv2(input_noise)
+        # Compute change and update the backward weight matrix (FA Matrix)
+        dW = mirror_learning_rate * F.conv2d(torch.transpose(input_noise, 0, 1),
+                                             torch.transpose(output_noise, 0, 1),
+                                             dilation=self.conv2.stride,
+                                             padding=self.conv2.padding)
+        dB = torch.transpose(F.interpolate(dW,
+                                           size=[self.conv2.weight.shape[2], self.conv2.weight.shape[3]]), 0, 1)
+        self.conv2.update_B(torch.nn.Parameter(dB), damping_factor)
+
         output_noise = self.bn2(output_noise)
         output_noise = self.relu2(output_noise)
-
-        # Update the backward weight matrix (FA Matrix)
-        weight_update = mirror_learning_rate * torch.matmul(input_noise, output_noise.T)
-        self.conv2.update_B(weight_update, damping_factor)
 
         # Create input noise with the dimensions of the input
         input_noise = noise_amplitude * (torch.randn(output_noise.size()))
 
         output_noise = self.conv3(input_noise)
+        # Compute change and update the backward weight matrix (FA Matrix)
+        dW = mirror_learning_rate * F.conv2d(torch.transpose(input_noise, 0, 1),
+                                             torch.transpose(output_noise, 0, 1),
+                                             dilation=self.conv3.stride,
+                                             padding=self.conv3.padding)
+        dB = torch.transpose(F.interpolate(dW,
+                                           size=[self.conv3.weight.shape[2], self.conv3.weight.shape[3]]), 0, 1)
+        self.conv3.update_B(torch.nn.Parameter(dB), damping_factor)
+
         output_noise = self.bn3(output_noise)
 
         if self.downsample is not None:
@@ -229,11 +258,7 @@ class Bottleneck(nn.Module):
         output_noise += identity
         output_noise = self.relu3(output_noise)
 
-        # Update the backward weight matrix (FA Matrix)
-        weight_update = mirror_learning_rate * torch.matmul(input_noise, output_noise.T)
-        self.conv3.update_B(weight_update, damping_factor)
-
-        return out
+        return output_noise
 
 
 class ResNet(nn.Module):
@@ -296,7 +321,7 @@ class ResNet(nn.Module):
                     nn.init.constant_(m.bn2.weight, 0)  # type: ignore[arg-type]
 
     def _make_layer(self, block: Type[Union[BasicBlock, Bottleneck]], planes: int, blocks: int,
-                    stride: int = 1, dilate: bool = False) -> nn.Sequential:
+                    stride: int = 1, dilate: bool = False) -> Sequential:
 
         norm_layer = self._norm_layer
         downsample = None
@@ -305,7 +330,7 @@ class ResNet(nn.Module):
             self.dilation *= stride
             stride = 1
         if stride != 1 or self.inplanes != planes * block.expansion:
-            downsample = nn.Sequential(
+            downsample = Sequential(
                 conv1x1(self.inplanes, planes * block.expansion, stride),
                 norm_layer(planes * block.expansion),
             )
@@ -320,7 +345,7 @@ class ResNet(nn.Module):
                                 base_width=self.base_width, dilation=self.dilation,
                                 norm_layer=norm_layer))
 
-        return nn.Sequential(*layers)
+        return Sequential(*layers)
 
     def _forward_impl(self, x: Tensor) -> Tensor:
         # See note [TorchScript super()]
@@ -348,24 +373,18 @@ class ResNet(nn.Module):
                        noise_amplitude: float = 0.1,
                        damping_factor: float = 0.5):
 
-        import pdb
-        pdb.set_trace()
-
         # Create input noise with the dimensions of the input
         with torch.no_grad():
-            input_noise_0 = noise_amplitude * (torch.randn(x.size()))
-            input_noise = input_noise_0
-            input_noise_zero_mean = input_noise - torch.mean(input_noise, dim=0)
+            input_noise = noise_amplitude * (torch.randn(x.size()))
+            output_noise = self.conv1(input_noise)
 
-            output_noise = self.conv1(input_noise_0)
+            # Compute change and update the backward weight matrix (FA Matrix)
+            dW = mirror_learning_rate * F.conv2d(torch.transpose(input_noise, 0, 1), torch.transpose(output_noise, 0, 1), dilation=self.conv1.stride, padding=self.conv1.padding)
+            dB = torch.transpose(F.interpolate(dW, size=[self.conv1.weight.shape[2], self.conv1.weight.shape[3]]), 0, 1)
+            self.conv1.update_B(torch.nn.Parameter(dB), damping_factor)
+
             output_noise = self.bn1(output_noise)
             output_noise = self.relu(output_noise)
-
-            # Update the backward weight matrix (FA Matrix)
-            input_noise_downsampled = interpolate(input_noise, output_noise.size())
-            weight_update = mirror_learning_rate * torch.matmul(input_noise_downsampled, output_noise.T)
-            self.conv1.update_B(weight_update, damping_factor)
-
             output_noise = self.maxpool(output_noise)
 
             output_noise = self.layer1.mirror_weights(output_noise, mirror_learning_rate, noise_amplitude, damping_factor)
@@ -382,7 +401,7 @@ class ResNet(nn.Module):
             output_noise = self.fc(input_noise)
 
             # Update the backward weight matrix (FA Matrix)
-            weight_update = mirror_learning_rate * torch.matmul(output_noise.T, input_noise)
+            weight_update = nn.Parameter(mirror_learning_rate * torch.matmul(output_noise.T, input_noise))
             self.fc.update_B(weight_update, damping_factor)
 
 
