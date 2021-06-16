@@ -1,10 +1,12 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
-from biotorch.autograd.fa.conv import Conv2dGrad
-from torch.nn.common_types import _size_2_t
 from typing import Union
+from torch.nn.common_types import _size_2_t
+from biotorch.autograd.fa.conv import Conv2dGrad
+from biotorch.layers.metrics import compute_matrix_angle
 
 
 class Conv2d(nn.Conv2d):
@@ -42,13 +44,28 @@ class Conv2d(nn.Conv2d):
             nn.init.constant_(self.bias, 1)
             nn.init.constant_(self.bias_backward, 1)
 
-    def update_B(self, weight_update, damping_factor=0.5):
-        self.weight_backward += weight_update
+        self.alignment = 0
+
+    def update_B(self,
+                 x,
+                 y,
+                 mirror_learning_rate=0.01,
+                 growth_control=True,
+                 damping_factor=0.5):
+
+        # Compute correlation and update the backward weight matrix (FA Matrix)
+        dW = mirror_learning_rate * F.conv2d(torch.transpose(x, 0, 1), torch.transpose(y, 0, 1), dilation=self.stride, padding=self.padding)
+        dB = torch.transpose(F.interpolate(dW, size=(self.weight.size()[2], self.weight.size()[3])), 0, 1)
+        self.weight_backward += torch.nn.Parameter(dB)
+
         # Prevent feedback weights growing too large
-        x = torch.randn(self.weight_backward.size())
-        y = torch.matmul(self.weight_backward, x)
-        y_std = torch.mean(torch.std(y, axis=0))
-        self.weight_backward = nn.Parameter(damping_factor * self.weight_backward / y_std, requires_grad=False)
+        if growth_control:
+            x = torch.randn(x.size())
+            y = F.conv2d(x, self.weight_backward)
+            # Mean of the standard deviation of the output per every channel
+            y_std = torch.mean(torch.std(y, axis=0), axis=[1, 2])
+            # Broadcast y_std and normalize across channels
+            self.weight_backward = nn.Parameter(damping_factor * (self.weight_backward.T / y_std).T, requires_grad=False)
 
     def forward(self, x):
         # Linear Feedback Alignment Backward
@@ -61,3 +78,7 @@ class Conv2d(nn.Conv2d):
                                 self.padding,
                                 self.dilation,
                                 self.groups)
+
+    def compute_alignment(self):
+        self.alignment = compute_matrix_angle(self.weight_backward, self.weight.T)
+        return self.alignment

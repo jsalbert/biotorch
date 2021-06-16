@@ -2,9 +2,9 @@ import math
 import torch
 
 
-def compute_angle(A, B):
+def compute_matrix_angle(A, B):
     with torch.no_grad():
-        # Flatten matrices
+        # Flatten and normalize matrices
         flat_A = torch.reshape(A, (-1, ))
         normalized_flat_A = flat_A / torch.norm(flat_A)
         flat_B = torch.reshape(B, (-1, ))
