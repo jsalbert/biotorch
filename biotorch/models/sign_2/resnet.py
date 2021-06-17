@@ -1,4 +1,5 @@
 import torchvision.models as models
+import biotorch.models.small_resnet as small_resnet
 
 from torchvision.models.resnet import ResNet
 from biotorch.models.utils import create_resnet_biomodel
@@ -20,6 +21,32 @@ def resnet18(pretrained: bool = False, progress: bool = True, num_classes: int =
     return create_resnet_biomodel(models.resnet18, MODE, pretrained, progress, num_classes)
 
 
+def resnet20(pretrained: bool = False, progress: bool = True, num_classes: int = 10) -> ResNet:
+    r"""ResNet-20 model from
+    `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
+
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
+    """
+    print('Converting ResNet-20 to {} mode'.format(MODE_STRING))
+    return create_resnet_biomodel(small_resnet.resnet20, MODE, pretrained, progress, num_classes)
+
+
+def resnet32(pretrained: bool = False, progress: bool = True, num_classes: int = 10) -> ResNet:
+    r"""ResNet-20 model from
+    `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
+
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
+    """
+    print('Converting ResNet-20 to {} mode'.format(MODE_STRING))
+    return create_resnet_biomodel(small_resnet.resnet32, MODE, pretrained, progress, num_classes)
+
+
 def resnet34(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:
     r"""ResNet-34 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
@@ -31,6 +58,19 @@ def resnet34(pretrained: bool = False, progress: bool = True, num_classes: int =
     """
     print('Converting ResNet-34 to {} mode'.format(MODE_STRING))
     return create_resnet_biomodel(models.resnet34, MODE, pretrained, progress, num_classes)
+
+
+def resnet44(pretrained: bool = False, progress: bool = True, num_classes: int = 10) -> ResNet:
+    r"""ResNet-44 model from
+    `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
+
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
+    """
+    print('Converting ResNet-44 to {} mode'.format(MODE_STRING))
+    return create_resnet_biomodel(small_resnet.resnet44, MODE, pretrained, progress, num_classes)
 
 
 def resnet50(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:
@@ -46,6 +86,19 @@ def resnet50(pretrained: bool = False, progress: bool = True, num_classes: int =
     return create_resnet_biomodel(models.resnet50, MODE, pretrained, progress, num_classes)
 
 
+def resnet56(pretrained: bool = False, progress: bool = True, num_classes: int = 10) -> ResNet:
+    r"""ResNet-56 model from
+    `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
+
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
+    """
+    print('Converting ResNet-56 to {} mode'.format(MODE_STRING))
+    return create_resnet_biomodel(small_resnet.resnet56, MODE, pretrained, progress, num_classes)
+
+
 def resnet101(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:
     r"""ResNet-101 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
@@ -59,6 +112,19 @@ def resnet101(pretrained: bool = False, progress: bool = True, num_classes: int 
     return create_resnet_biomodel(models.resnet101, MODE, pretrained, progress, num_classes)
 
 
+def resnet110(pretrained: bool = False, progress: bool = True, num_classes: int = 10) -> ResNet:
+    r"""ResNet-110 model from
+    `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
+
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
+    """
+    print('Converting ResNet-110 to {} mode'.format(MODE_STRING))
+    return create_resnet_biomodel(small_resnet.resnet110, MODE, pretrained, progress, num_classes)
+
+
 def resnet152(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:
     r"""ResNet-152 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
@@ -70,6 +136,19 @@ def resnet152(pretrained: bool = False, progress: bool = True, num_classes: int 
     """
     print('Converting ResNet-152 to {} mode'.format(MODE_STRING))
     return create_resnet_biomodel(models.resnet152, MODE, pretrained, progress, num_classes)
+
+
+def resnet1202(pretrained: bool = False, progress: bool = True, num_classes: int = 10) -> ResNet:
+    r"""ResNet-1202 model from
+    `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
+
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
+    """
+    print('Converting ResNet-1202 to {} mode'.format(MODE_STRING))
+    return create_resnet_biomodel(small_resnet.resnet1202, MODE, pretrained, progress, num_classes)
 
 
 def resnext50_32x4d(pretrained: bool = False, progress: bool = True, num_classes: int = 1000) -> ResNet:

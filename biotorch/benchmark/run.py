@@ -76,7 +76,7 @@ class Benchmark:
                 self.model = models.__dict__[self.model_config['mode']].__dict__[
                     self.model_config['architecture']](pretrained=True, num_classes=self.num_classes)
             else:
-                print("=> Creating model from sratch'{}'".format(self.model_config['architecture']))
+                print("=> Creating model from sratch '{}'".format(self.model_config['architecture']))
                 self.model = models.__dict__[self.model_config['mode']].__dict__[
                     self.model_config['architecture']](num_classes=self.num_classes)
 

@@ -1,0 +1,40 @@
+# Experiment Information
+experiment:
+  name: "experiment_CIFAR10_Benchmark_weight_mirroring_resnet20"
+  output_dir: "trained_models"
+
+# Dataset
+dataset:
+  name: "cifar10"
+
+# Model
+model:
+  architecture: "resnet20"
+  mode: "weight_mirroring"
+  pretrained: false
+  # checkpoint:
+
+# Training Parameters
+training:
+  hyperparameters:
+    epochs: 100
+    batch_size: 128
+    target_size: 32
+
+  optimizer:
+    type: "RMSProp"
+    lr: 0.01
+    weight_decay: 0.00001
+    momentum: 0
+
+  metrics:
+    top_k: 5
+    display_iterations: 500
+
+  loss_function:
+    name: "cross_entropy"
+
+
+# Infrastructure
+infrastructure:
+  num_gpus: 1

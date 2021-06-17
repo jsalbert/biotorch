@@ -5,7 +5,6 @@ import torch.nn.functional as F
 
 from torch import Tensor
 from collections import OrderedDict
-from torch.nn.functional import interpolate
 from torchvision.models.resnet import ResNet
 from biotorch.layers.weight_mirroring import Conv2d, Linear, Sequential
 from typing import Type, Any, Callable, Union, List, Optional
@@ -379,10 +378,26 @@ class ResNet(nn.Module):
             output_noise = self.relu(output_noise)
             output_noise = self.maxpool(output_noise)
 
-            output_noise = self.layer1.mirror_weights(output_noise, mirror_learning_rate, noise_amplitude, damping_factor)
-            output_noise = self.layer2.mirror_weights(output_noise, mirror_learning_rate, noise_amplitude, damping_factor)
-            output_noise = self.layer3.mirror_weights(output_noise, mirror_learning_rate, noise_amplitude, damping_factor)
-            output_noise = self.layer4.mirror_weights(output_noise, mirror_learning_rate, noise_amplitude, damping_factor)
+            output_noise = self.layer1.mirror_weights(output_noise,
+                                                      mirror_learning_rate,
+                                                      noise_amplitude,
+                                                      growth_control,
+                                                      damping_factor)
+            output_noise = self.layer2.mirror_weights(output_noise,
+                                                      mirror_learning_rate,
+                                                      noise_amplitude,
+                                                      growth_control,
+                                                      damping_factor)
+            output_noise = self.layer3.mirror_weights(output_noise,
+                                                      mirror_learning_rate,
+                                                      noise_amplitude,
+                                                      growth_control,
+                                                      damping_factor)
+            output_noise = self.layer4.mirror_weights(output_noise,
+                                                      mirror_learning_rate,
+                                                      noise_amplitude,
+                                                      growth_control,
+                                                      damping_factor)
 
             output_noise = self.avgpool(output_noise)
             output_noise = torch.flatten(output_noise, 1)
@@ -422,6 +437,7 @@ def resnet18(pretrained: bool = False, progress: bool = True, num_classes: int =
         progress (bool): If True, displays a progress bar of the download to stderr
         num_classes (int): Output dimension of the last linear layer
     """
+    print('Converting ResNet-18 to {} mode'.format(MODE_STRING))
     return _resnet('resnet18', BasicBlock, [2, 2, 2, 2], pretrained, progress, **kwargs, num_classes=num_classes)
 
 
@@ -434,6 +450,7 @@ def resnet34(pretrained: bool = False, progress: bool = True, num_classes: int =
         progress (bool): If True, displays a progress bar of the download to stderr
         num_classes (int): Output dimension of the last linear layer
     """
+    print('Converting ResNet-34 to {} mode'.format(MODE_STRING))
     return _resnet('resnet34', BasicBlock, [3, 4, 6, 3], pretrained, progress,
                    **kwargs, num_classes=num_classes)
 
@@ -447,6 +464,7 @@ def resnet50(pretrained: bool = False, progress: bool = True, num_classes: int =
         progress (bool): If True, displays a progress bar of the download to stderr
         num_classes (int): Output dimension of the last linear layer
     """
+    print('Converting ResNet-50 to {} mode'.format(MODE_STRING))
     return _resnet('resnet50', Bottleneck, [3, 4, 6, 3], pretrained, progress,
                    **kwargs, num_classes=num_classes)
 
@@ -460,6 +478,7 @@ def resnet101(pretrained: bool = False, progress: bool = True, num_classes: int 
         progress (bool): If True, displays a progress bar of the download to stderr
         num_classes (int): Output dimension of the last linear layer
     """
+    print('Converting ResNet-101 to {} mode'.format(MODE_STRING))
     return _resnet('resnet101', Bottleneck, [3, 4, 23, 3], pretrained, progress,
                    **kwargs, num_classes=num_classes)
 
@@ -473,6 +492,7 @@ def resnet152(pretrained: bool = False, progress: bool = True, num_classes: int 
         progress (bool): If True, displays a progress bar of the download to stderr
         num_classes (int): Output dimension of the last linear layer
     """
+    print('Converting ResNet-152 to {} mode'.format(MODE_STRING))
     return _resnet('resnet152', Bottleneck, [3, 8, 36, 3], pretrained, progress,
                    **kwargs, num_classes=num_classes)
 
@@ -488,6 +508,7 @@ def resnext50_32x4d(pretrained: bool = False, progress: bool = True, num_classes
     """
     kwargs['groups'] = 32
     kwargs['width_per_group'] = 4
+    print('Converting ResNeXt-50 32x4d to {} mode'.format(MODE_STRING))
     return _resnet('resnext50_32x4d', Bottleneck, [3, 4, 6, 3],
                    pretrained, progress, **kwargs, num_classes=num_classes)
 
@@ -503,6 +524,7 @@ def resnext101_32x8d(pretrained: bool = False, progress: bool = True, num_classe
     """
     kwargs['groups'] = 32
     kwargs['width_per_group'] = 8
+    print('Converting ResNeXt-101 32x8d {} mode'.format(MODE_STRING))
     return _resnet('resnext101_32x8d', Bottleneck, [3, 4, 23, 3],
                    pretrained, progress, **kwargs, num_classes=num_classes)
 
@@ -522,12 +544,13 @@ def wide_resnet50_2(pretrained: bool = False, progress: bool = True, num_classes
         num_classes (int): Output dimension of the last linear layer
     """
     kwargs['width_per_group'] = 64 * 2
+    print('Converting Wide ResNet-50-2 to {} mode'.format(MODE_STRING))
     return _resnet('wide_resnet50_2', Bottleneck, [3, 4, 6, 3],
                    pretrained, progress, **kwargs, num_classes=num_classes)
 
 
 def wide_resnet101_2(pretrained: bool = False, progress: bool = True, num_classes: int = 1000, **kwargs: Any) -> ResNet:
-    r"""Wide ResNet-101-2 model from
+    r"""Wide ResNet-50-2 model from
     `"Wide Residual Networks" <https://arxiv.org/pdf/1605.07146.pdf>`_.
 
     The model is the same as ResNet except for the bottleneck number of channels
@@ -541,5 +564,6 @@ def wide_resnet101_2(pretrained: bool = False, progress: bool = True, num_classe
         num_classes (int): Output dimension of the last linear layer
     """
     kwargs['width_per_group'] = 64 * 2
+    print('Converting Wide ResNet-50-2 to {} mode'.format(MODE_STRING))
     return _resnet('wide_resnet101_2', Bottleneck, [3, 4, 23, 3],
                    pretrained, progress, **kwargs, num_classes=num_classes)

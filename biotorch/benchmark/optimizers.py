@@ -6,7 +6,7 @@ def create_optimizer(optimizer_config, model):
     lr = optimizer_config['lr']
     weight_decay = optimizer_config['weight_decay']
     momentum = optimizer_config['momentum']
-    
+
     if optimizer_config['type'] == 'RMSProp':
         optimizer = torch.optim.RMSprop(model.parameters(),
                                         lr=lr,
