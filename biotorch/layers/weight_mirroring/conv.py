@@ -50,7 +50,7 @@ class Conv2d(nn.Conv2d):
                  x,
                  y,
                  mirror_learning_rate=0.01,
-                 growth_control=True,
+                 growth_control=False,
                  damping_factor=0.5):
 
         # Compute correlation and update the backward weight matrix (FA Matrix)
@@ -60,7 +60,8 @@ class Conv2d(nn.Conv2d):
 
         # Prevent feedback weights growing too large
         if growth_control:
-            x = torch.randn(x.size())
+            device = x.device
+            x = torch.randn(x.size()).to(device)
             y = F.conv2d(x, self.weight_backward)
             # Mean of the standard deviation of the output per every channel
             y_std = torch.mean(torch.std(y, axis=0), axis=[1, 2])
@@ -80,5 +81,5 @@ class Conv2d(nn.Conv2d):
                                 self.groups)
 
     def compute_alignment(self):
-        self.alignment = compute_matrix_angle(self.weight_backward, self.weight.T)
+        self.alignment = compute_matrix_angle(self.weight_backward, self.weight)
         return self.alignment

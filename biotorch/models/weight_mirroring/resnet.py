@@ -97,36 +97,40 @@ class BasicBlock(nn.Module):
     def mirror_weights(self, x: Tensor,
                        mirror_learning_rate: float = 0.01,
                        noise_amplitude: float = 0.1,
+                       growth_control: bool = False,
                        damping_factor: float = 0.5):
 
         # Create input noise with the dimensions of the input
-        input_noise_0 = noise_amplitude * (torch.randn(x.size()))
+        input_noise_0 = (noise_amplitude * (torch.randn(x.size()))).to(x.device)
         output_noise_identity = input_noise_0
 
         output_noise = self.conv1(input_noise_0)
         # Compute noise correlation and update the backward weight matrix (Backward Matrix)
-        # self.conv1.update_B(x=input_noise_0, y=output_noise,
-        #                     mirror_learning_rate=mirror_learning_rate,
-        #                     damping_factor=damping_factor)
+        self.conv1.update_B(x=input_noise_0, y=output_noise,
+                            mirror_learning_rate=mirror_learning_rate,
+                            growth_control=growth_control,
+                            damping_factor=damping_factor)
 
         output_noise = self.bn1(output_noise)
         output_noise = self.relu(output_noise)
 
         # Create input noise with the dimensions of the input
-        input_noise = noise_amplitude * (torch.randn(output_noise.size()))
+        input_noise = (noise_amplitude * (torch.randn(output_noise.size()))).to(x.device)
         output_noise = self.conv2(input_noise)
         # Compute change and update the backward weight matrix (FA Matrix)
-        # self.conv2.update_B(x=input_noise, y=output_noise,
-        #                     mirror_learning_rate=mirror_learning_rate,
-        #                     damping_factor=damping_factor)
+        self.conv2.update_B(x=input_noise, y=output_noise,
+                            mirror_learning_rate=mirror_learning_rate,
+                            growth_control=growth_control,
+                            damping_factor=damping_factor)
 
         output_noise = self.bn2(output_noise)
 
         if self.downsample is not None:
             output_noise_identity = self.downsample[0](input_noise_0)
-            # self.downsample[0].update_B(x=input_noise_0, y=output_noise_identity,
-            #                             mirror_learning_rate=mirror_learning_rate,
-            #                             damping_factor=damping_factor)
+            self.downsample[0].update_B(x=input_noise_0, y=output_noise_identity,
+                                        mirror_learning_rate=mirror_learning_rate,
+                                        growth_control=growth_control,
+                                        damping_factor=damping_factor)
 
         output_noise += output_noise_identity
         output_noise = self.relu2(output_noise)
@@ -196,13 +200,13 @@ class Bottleneck(nn.Module):
     def mirror_weights(self, x: Tensor,
                        mirror_learning_rate: float = 0.01,
                        noise_amplitude: float = 0.1,
+                       growth_control: bool = False,
                        damping_factor: float = 0.5):
 
         # Create input noise with the dimensions of the input
-        input_noise_0 = noise_amplitude * (torch.randn(x.size()))
+        input_noise_0 = (noise_amplitude * (torch.randn(x.size()))).to(x.device)
         output_noise_identity = input_noise_0
 
-        print(output_noise_identity.size())
         output_noise = self.conv1(input_noise_0)
 
         self.conv1.update_B(x=input_noise_0, y=output_noise, mirror_learning_rate=mirror_learning_rate,
@@ -212,22 +216,24 @@ class Bottleneck(nn.Module):
         output_noise = self.relu(output_noise)
 
         # Create input noise with the dimensions of the input
-        input_noise = noise_amplitude * (torch.randn(output_noise.size()))
-        print(output_noise_identity.size())
-
+        input_noise = (noise_amplitude * (torch.randn(output_noise.size()))).to(x.device)
         output_noise = self.conv2(input_noise)
 
-        self.conv2.update_B(x=input_noise, y=output_noise, mirror_learning_rate=mirror_learning_rate,
+        self.conv2.update_B(x=input_noise, y=output_noise,
+                            mirror_learning_rate=mirror_learning_rate,
+                            growth_control=growth_control,
                             damping_factor=damping_factor)
 
         output_noise = self.bn2(output_noise)
         output_noise = self.relu2(output_noise)
 
         # Create input noise with the dimensions of the input
-        input_noise = noise_amplitude * (torch.randn(output_noise.size()))
+        input_noise = (noise_amplitude * (torch.randn(output_noise.size()))).to(x.device)
 
         output_noise = self.conv3(input_noise)
-        self.conv3.update_B(x=input_noise, y=output_noise, mirror_learning_rate=mirror_learning_rate,
+        self.conv3.update_B(x=input_noise, y=output_noise,
+                            mirror_learning_rate=mirror_learning_rate,
+                            growth_control=growth_control,
                             damping_factor=damping_factor)
 
         output_noise = self.bn3(output_noise)
@@ -235,7 +241,9 @@ class Bottleneck(nn.Module):
         if self.downsample is not None:
             output_noise_identity = self.downsample[0](input_noise_0)
             self.downsample[0].update_B(x=input_noise, y=output_noise_identity,
-                                        mirror_learning_rate=mirror_learning_rate, damping_factor=damping_factor)
+                                        mirror_learning_rate=mirror_learning_rate,
+                                        growth_control=growth_control,
+                                        damping_factor=damping_factor)
 
         output_noise += output_noise_identity
         output_noise = self.relu3(output_noise)
@@ -353,17 +361,19 @@ class ResNet(nn.Module):
     def mirror_weights(self, x: Tensor,
                        mirror_learning_rate: float = 0.1,
                        noise_amplitude: float = 0.1,
+                       growth_control: bool = False,
                        damping_factor: float = 0.5):
 
         with torch.no_grad():
             # Create input noise with the dimensions of the input
-            input_noise = noise_amplitude * (torch.randn(x.size()))
+            input_noise = (noise_amplitude * (torch.randn(x.size()))).to(x.device)
             output_noise = self.conv1(input_noise)
 
             # Compute signal correlation and update the backward weight matrix (FA Matrix)
-            # self.conv1.update_B(x=input_noise, y=output_noise,
-            #                     mirror_learning_rate=mirror_learning_rate,
-            #                     damping_factor=damping_factor)
+            self.conv1.update_B(x=input_noise, y=output_noise,
+                                mirror_learning_rate=mirror_learning_rate,
+                                growth_control=growth_control,
+                                damping_factor=damping_factor)
 
             output_noise = self.bn1(output_noise)
             output_noise = self.relu(output_noise)
@@ -378,11 +388,12 @@ class ResNet(nn.Module):
             output_noise = torch.flatten(output_noise, 1)
 
             # Create input noise with the dimensions of the input
-            input_noise = noise_amplitude * (torch.randn(output_noise.size()))
+            input_noise = (noise_amplitude * (torch.randn(output_noise.size()))).to(x.device)
             output_noise = self.fc(input_noise)
             # Update the backward weight matrix (FA Matrix)
             self.fc.update_B(x=input_noise, y=output_noise,
                              mirror_learning_rate=mirror_learning_rate,
+                             growth_control=growth_control,
                              damping_factor=damping_factor)
 
 
@@ -402,95 +413,101 @@ def _resnet(
     return model
 
 
-def resnet18(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
+def resnet18(pretrained: bool = False, progress: bool = True, num_classes: int = 1000, **kwargs: Any) -> ResNet:
     r"""ResNet-18 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
     """
-    return _resnet('resnet18', BasicBlock, [2, 2, 2, 2], pretrained, progress,
-                   **kwargs)
+    return _resnet('resnet18', BasicBlock, [2, 2, 2, 2], pretrained, progress, **kwargs, num_classes=num_classes)
 
 
-def resnet34(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
+def resnet34(pretrained: bool = False, progress: bool = True, num_classes: int = 1000, **kwargs: Any) -> ResNet:
     r"""ResNet-34 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
     """
     return _resnet('resnet34', BasicBlock, [3, 4, 6, 3], pretrained, progress,
-                   **kwargs)
+                   **kwargs, num_classes=num_classes)
 
 
-def resnet50(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
+def resnet50(pretrained: bool = False, progress: bool = True, num_classes: int = 1000, **kwargs: Any) -> ResNet:
     r"""ResNet-50 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
     """
     return _resnet('resnet50', Bottleneck, [3, 4, 6, 3], pretrained, progress,
-                   **kwargs)
+                   **kwargs, num_classes=num_classes)
 
 
-def resnet101(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
+def resnet101(pretrained: bool = False, progress: bool = True, num_classes: int = 1000, **kwargs: Any) -> ResNet:
     r"""ResNet-101 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
     """
     return _resnet('resnet101', Bottleneck, [3, 4, 23, 3], pretrained, progress,
-                   **kwargs)
+                   **kwargs, num_classes=num_classes)
 
 
-def resnet152(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
+def resnet152(pretrained: bool = False, progress: bool = True, num_classes: int = 1000, **kwargs: Any) -> ResNet:
     r"""ResNet-152 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
     """
     return _resnet('resnet152', Bottleneck, [3, 8, 36, 3], pretrained, progress,
-                   **kwargs)
+                   **kwargs, num_classes=num_classes)
 
 
-def resnext50_32x4d(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
+def resnext50_32x4d(pretrained: bool = False, progress: bool = True, num_classes: int = 1000, **kwargs: Any) -> ResNet:
     r"""ResNeXt-50 32x4d model from
     `"Aggregated Residual Transformation for Deep Neural Networks" <https://arxiv.org/pdf/1611.05431.pdf>`_.
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
     """
     kwargs['groups'] = 32
     kwargs['width_per_group'] = 4
     return _resnet('resnext50_32x4d', Bottleneck, [3, 4, 6, 3],
-                   pretrained, progress, **kwargs)
+                   pretrained, progress, **kwargs, num_classes=num_classes)
 
 
-def resnext101_32x8d(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
+def resnext101_32x8d(pretrained: bool = False, progress: bool = True, num_classes: int = 1000, **kwargs: Any) -> ResNet:
     r"""ResNeXt-101 32x8d model from
     `"Aggregated Residual Transformation for Deep Neural Networks" <https://arxiv.org/pdf/1611.05431.pdf>`_.
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
     """
     kwargs['groups'] = 32
     kwargs['width_per_group'] = 8
     return _resnet('resnext101_32x8d', Bottleneck, [3, 4, 23, 3],
-                   pretrained, progress, **kwargs)
+                   pretrained, progress, **kwargs, num_classes=num_classes)
 
 
-def wide_resnet50_2(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
+def wide_resnet50_2(pretrained: bool = False, progress: bool = True, num_classes: int = 1000, **kwargs: Any) -> ResNet:
     r"""Wide ResNet-50-2 model from
     `"Wide Residual Networks" <https://arxiv.org/pdf/1605.07146.pdf>`_.
 
@@ -502,13 +519,14 @@ def wide_resnet50_2(pretrained: bool = False, progress: bool = True, **kwargs: A
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
     """
     kwargs['width_per_group'] = 64 * 2
     return _resnet('wide_resnet50_2', Bottleneck, [3, 4, 6, 3],
-                   pretrained, progress, **kwargs)
+                   pretrained, progress, **kwargs, num_classes=num_classes)
 
 
-def wide_resnet101_2(pretrained: bool = False, progress: bool = True, **kwargs: Any) -> ResNet:
+def wide_resnet101_2(pretrained: bool = False, progress: bool = True, num_classes: int = 1000, **kwargs: Any) -> ResNet:
     r"""Wide ResNet-101-2 model from
     `"Wide Residual Networks" <https://arxiv.org/pdf/1605.07146.pdf>`_.
 
@@ -520,7 +538,8 @@ def wide_resnet101_2(pretrained: bool = False, progress: bool = True, **kwargs: 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         progress (bool): If True, displays a progress bar of the download to stderr
+        num_classes (int): Output dimension of the last linear layer
     """
     kwargs['width_per_group'] = 64 * 2
     return _resnet('wide_resnet101_2', Bottleneck, [3, 4, 23, 3],
-                   pretrained, progress, **kwargs)
+                   pretrained, progress, **kwargs, num_classes=num_classes)

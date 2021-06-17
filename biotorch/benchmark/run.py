@@ -2,17 +2,17 @@ import os
 import torch
 import shutil
 import torch.nn as nn
+import biotorch.models as models
 import torch.backends.cudnn as cudnn
 
+
 from types import ModuleType
-import biotorch.models as models
-from biotorch.datasets.selector import DatasetSelector
 from biotorch.training.trainer import Trainer
-from biotorch.utils.validator import validate_config
 from biotorch.utils.utils import read_yaml, mkdir
-
-
-DATASETS_AVAILABLE = ['mnist', 'cifar10', 'cifar100']
+from biotorch.utils.validator import validate_config
+from biotorch.datasets.selector import DatasetSelector
+from biotorch.benchmark.optimizers import create_optimizer
+from biotorch.benchmark.losses import select_loss_function
 
 
 class Benchmark:
@@ -25,7 +25,9 @@ class Benchmark:
             # Parse config file
             self.n_gpus = self.config_file['infrastructure']['num_gpus']
             self.hyperparameters = self.config_file['training']['hyperparameters']
-            self.dataset_names = DATASETS_AVAILABLE
+            self.metrics = self.config_file['training']['metrics']
+            self.optimizer_config = self.config_file['training']['optimizer']
+            self.loss_function_config = self.config_file['training']['loss_function']
             self.model_config = self.config_file['model']
             self.dataset_config = self.config_file['dataset']
 
@@ -40,7 +42,8 @@ class Benchmark:
             self.model_names = sorted(name for name in options if name.islower() and not name.startswith("__")
                                       and callable(options[name]))
             self.multi_gpu = False
-            self.output_dir = self.config_file['experiment']['output_dir']
+            self.output_dir = os.path.join(self.config_file['experiment']['output_dir'],
+                                           self.config_file['experiment']['name'])
             mkdir(self.output_dir)
             shutil.copy2(self.config_file_path, os.path.join(self.output_dir, 'config.yaml'))
 
@@ -60,23 +63,22 @@ class Benchmark:
         self.target_size = self.hyperparameters['target_size']
 
         # Create dataset
-        if self.dataset_config['name'] in self.dataset_names:
-            self.dataset_creator = DatasetSelector(self.dataset_config['name']).get_dataset()
-            self.dataset = self.dataset_creator(self.target_size)
-            self.train_dataloader = self.dataset.create_train_dataloader(self.batch_size)
-            self.test_dataloader = self.dataset.create_test_dataloader(self.batch_size)
-            self.num_classes = self.dataset.num_classes
+        self.dataset_creator = DatasetSelector(self.dataset_config['name']).get_dataset()
+        self.dataset = self.dataset_creator(self.target_size)
+        self.train_dataloader = self.dataset.create_train_dataloader(self.batch_size)
+        self.val_dataloader = self.dataset.create_val_dataloader(self.batch_size)
+        self.num_classes = self.dataset.num_classes
 
         # Create model
         if self.model_config['architecture'] is not None and self.model_config['architecture'] in self.model_names:
             if self.model_config['pretrained']:
                 print("=> Using pre-trained model '{}'".format(self.model_config['architecture']))
                 self.model = models.__dict__[self.model_config['mode']].__dict__[
-                    self.model_config['architecture']](pretrained=True, )
+                    self.model_config['architecture']](pretrained=True, num_classes=self.num_classes)
             else:
                 print("=> Creating model from sratch'{}'".format(self.model_config['architecture']))
                 self.model = models.__dict__[self.model_config['mode']].__dict__[
-                    self.model_config['architecture']]()
+                    self.model_config['architecture']](num_classes=self.num_classes)
 
         elif self.model_config['checkpoint'] is not None:
             self.model = torch.load(self.model_config['checkpoint'])
@@ -87,8 +89,8 @@ class Benchmark:
             self.model = nn.DataParallel(self.model, list(range(0, self.n_gpus)))
             self.multi_gpu = True
 
-        self.loss_function = torch.nn.CrossEntropyLoss()
-        self.optimizer = torch.optim.RMSprop(self.model.parameters(), lr=1e-4, weight_decay=0.)
+        self.loss_function = select_loss_function(self.loss_function_config)
+        self.optimizer = create_optimizer(self.optimizer_config, self.model)
 
         print('\nBenchmarking model on {}'.format(str(self.dataset)))
 
@@ -97,9 +99,10 @@ class Benchmark:
                           loss_function=self.loss_function,
                           optimizer=self.optimizer,
                           train_dataloader=self.train_dataloader,
-                          test_dataloader=self.test_dataloader,
+                          val_dataloader=self.val_dataloader,
                           device=self.device,
                           epochs=self.epochs,
+                          output_dir=self.output_dir,
                           multi_gpu=self.multi_gpu,
                           display_iterations=500)
         trainer.run()

@@ -60,22 +60,51 @@
       "hyperparameters": {
         "type": "object",
         "properties": {
-          "loss_function": {
-            "type": "string",
-            "default": "categorical_crossentropy"
-          },
           "num_epochs": {
-            "type": "integer",
-            "default": 10
+            "type": "integer"
           },
           "batch_size": {
             "type": "integer",
             "default": 32
+          },
+          "target_size": {
+            "type": "integer"
           }
         },
         "additionalProperties": false,
         "required": [
-          "num_epochs"
+          "num_epochs",
+          "target_size"
+        ]
+      },
+      "loss_function": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "cross_entropy"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name"
+        ]
+      },
+      "metrics": {
+        "type": "object",
+        "properties": {
+          "top_k": {
+            "type": "integer",
+            "default": 5
+          },
+          "display_iterations": {
+            "type": "integer",
+            "default": 500
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name"
         ]
       },
       "optimizer": {
@@ -88,7 +117,7 @@
                 "type": "number",
                 "default": 0.001
               },
-              "decay": {
+              "weight_decay": {
                 "type": "number",
                 "default": 0.0
               },
@@ -108,7 +137,7 @@
             "additionalProperties": false,
             "required": [
               "lr",
-              "decay",
+              "weight_decay",
               "momentum"
             ],
             "default": {}
@@ -132,7 +161,7 @@
                 "type": "number",
                 "default": 0.0
               },
-              "decay": {
+              "weight_decay": {
                 "type": "number",
                 "default": 0.0
               }
@@ -143,7 +172,7 @@
               "beta_1",
               "beta_2",
               "epsilon",
-              "decay"
+              "weight_decay"
             ]
           },
           "RMSProp": {
@@ -157,18 +186,21 @@
                 "type": "number",
                 "default": 0.0
               },
-              "decay": {
+              "weight_decay": {
                 "type": "number",
                 "default": 0.0
+              },
+              "momentum": {
+                "type": "number",
+                "default": 0.9
               }
             },
             "additionalProperties": false,
             "required": [
               "lr",
-              "beta_1",
-              "beta_2",
+              "momentum",
               "epsilon",
-              "decay"
+              "weight_decay"
             ]
           }
         },

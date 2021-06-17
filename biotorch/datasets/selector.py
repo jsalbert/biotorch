@@ -5,8 +5,15 @@ from biotorch.datasets.tiny_imagenet import TinyImageNet
 from biotorch.datasets.imagenet import ImageNet
 
 
+DATASETS_AVAILABLE = ['mnist', 'cifar10', 'cifar100', 'fashion-mnist', 'tiny-imagenet', 'imagenet']
+
+
 class DatasetSelector:
     def __init__(self, dataset_name):
+        if dataset_name not in DATASETS_AVAILABLE:
+            raise ValueError('Dataset name specified: {} not in the list of available datasets {}'.format(
+                dataset_name, DATASETS_AVAILABLE)
+            )
         self.dataset_name = dataset_name
 
     def get_dataset(self):

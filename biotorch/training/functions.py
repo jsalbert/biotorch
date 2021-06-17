@@ -10,6 +10,7 @@ def train(model,
           train_dataloader,
           device,
           epoch,
+          top_k=5,
           display_iterations=500):
 
     # Create Metrics
@@ -17,10 +18,10 @@ def train(model,
     data_time = AverageMeter('Data', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
     top1 = AverageMeter('Acc@1', ':6.2f')
-    top5 = AverageMeter('Acc@5', ':6.2f')
+    topk = AverageMeter('Acc@'+str(top_k), ':6.2f')
     progress = ProgressMeter(
         len(train_dataloader),
-        [batch_time, data_time, losses, top1, top5],
+        [batch_time, data_time, losses, top1, topk],
         prefix="Epoch: [{}]".format(epoch))
 
     # Switch mode
@@ -36,15 +37,16 @@ def train(model,
             outputs = model(inputs, targets, loss_function)
         else:
             outputs = model(inputs)
+
         # Calculate loss
         outputs = torch.squeeze(outputs)
         loss = loss_function(outputs, targets)
 
         # Measure accuracy and record loss
-        acc1, acc5 = accuracy(outputs, targets, topk=(1, 5))
+        acc1, acck = accuracy(outputs, targets, topk=(1, top_k))
         losses.update(loss.item(), inputs.size(0))
         top1.update(acc1[0], inputs.size(0))
-        top5.update(acc5[0], inputs.size(0))
+        topk.update(acck[0], inputs.size(0))
 
         # Zero gradients
         model.zero_grad()
@@ -54,7 +56,7 @@ def train(model,
         optimizer.step()
 
         if mode == 'weight_transport':
-            pass
+            model.mirror_weights(torch.randn(inputs.size()))
             # do something
         # Measure elapsed time
         batch_time.update(time.time() - end)
@@ -63,22 +65,19 @@ def train(model,
         if idx_batch % display_iterations == 0:
             progress.display(idx_batch)
 
+    return top1.avg, losses.avg
+
 
 def test(model,
          loss_function,
          test_dataloader,
          device,
-         display_iterations=10):
+         ):
 
     batch_time = AverageMeter('Time', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
     top1 = AverageMeter('Acc@1', ':6.2f')
     top5 = AverageMeter('Acc@5', ':6.2f')
-
-    progress = ProgressMeter(
-        len(test_dataloader),
-        [batch_time, losses, top1, top5],
-        prefix='Test: ')
 
     # Switch to evaluate mode
     model.eval()
@@ -99,9 +98,6 @@ def test(model,
             losses.update(loss.item(), inputs.size(0))
             top1.update(acc1[0], inputs.size(0))
             top5.update(acc5[0], inputs.size(0))
-
-            # if idx_batch % display_iterations == 0:
-            #     progress.display(idx_batch)
 
         print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'.format(top1=top1, top5=top5))
     return top1.avg, losses.avg

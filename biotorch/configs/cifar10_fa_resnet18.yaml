@@ -1,6 +1,6 @@
 # Experiment Information
 experiment:
-  name: "CIFAR10 Benchmark"
+  name: "CIFAR10_FA_Benchmark"
   output_dir: "trained_models"
 
 # Dataset
@@ -18,12 +18,22 @@ model:
 training:
   hyperparameters:
     epochs: 10
-    batch_size: 32
+    batch_size: 64
     target_size: 224
 
   optimizer:
-    'type': "RMSProp"
-    'lr': 0.001
+    type: "RMSProp"
+    lr: 0.001
+    weight_decay: 0
+    momentum: 0
+
+  metrics:
+    top_k: 5
+    display_iterations: 500
+
+  loss_function:
+    name: "cross_entropy"
+
 
 # Infrastructure
 infrastructure:
