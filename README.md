@@ -21,9 +21,23 @@ During learning, the brain modifies synapses to improve behaviour. In the cortex
 _Lillicrap, T. P., Santoro, A., Marris, L., Akerman, C. J., & Hinton, G. (2020). Backpropagation and the brain. Nature Reviews Neuroscience, 21(6), 335-346._
 
 ## Methods Supported
+
 | Name  | Description |
 | :---         |     :---      |
 | [Feedback Alignment](https://arxiv.org/abs/1411.0247)    |      |
 | [Direct Feedback Alignment](https://arxiv.org/abs/1609.01596)    |         |
 | [Sign Symmetry](https://arxiv.org/abs/1811.03567)     |   |
-| [Weight Mirrors](https://arxiv.org/abs/1904.05391)     |   |
+| [Weight Mirroring](https://arxiv.org/abs/1904.05391)     |   |
+
+## Benchmark
+
+### CIFAR 10
+| Method Name  | Acc@1 |
+| :---         |     :---      |
+| Backpropagation| |
+| Feedback Alignment|      |
+| Direct Feedback Alignment|         |
+| Sign Symmetry|   |
+| Weight Mirroring|   |
+
+
