@@ -12,6 +12,7 @@ from biotorch.utils.utils import read_yaml, mkdir
 from biotorch.utils.validator import validate_config
 from biotorch.datasets.selector import DatasetSelector
 from biotorch.benchmark.optimizers import create_optimizer
+from biotorch.benchmark.lr_schedulers import create_lr_scheduler
 from biotorch.benchmark.losses import select_loss_function
 
 
@@ -28,6 +29,7 @@ class Benchmark:
             self.metrics = self.config_file['training']['metrics']
             self.optimizer_config = self.config_file['training']['optimizer']
             self.loss_function_config = self.config_file['training']['loss_function']
+            self.lr_scheduler_config = self.config_file['training']['lr_scheduler']
             self.model_config = self.config_file['model']
             self.dataset_config = self.config_file['dataset']
 
@@ -91,6 +93,7 @@ class Benchmark:
 
         self.loss_function = select_loss_function(self.loss_function_config)
         self.optimizer = create_optimizer(self.optimizer_config, self.model)
+        self.lr_scheduler = create_lr_scheduler(self.lr_scheduler_config, self.optimizer)
 
         print('\nBenchmarking model on {}'.format(str(self.dataset)))
 
@@ -98,6 +101,7 @@ class Benchmark:
                           mode=self.mode,
                           loss_function=self.loss_function,
                           optimizer=self.optimizer,
+                          lr_scheduler=self.lr_scheduler,
                           train_dataloader=self.train_dataloader,
                           val_dataloader=self.val_dataloader,
                           device=self.device,

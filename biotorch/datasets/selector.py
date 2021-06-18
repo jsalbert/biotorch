@@ -1,11 +1,11 @@
-from biotorch.datasets.cifar import CIFAR10, CIFAR100
+from biotorch.datasets.cifar import CIFAR10, CIFAR10Benchmark, CIFAR100
 from biotorch.datasets.mnist import MNIST
 from biotorch.datasets.fashion_mnist import FashionMNIST
 from biotorch.datasets.tiny_imagenet import TinyImageNet
 from biotorch.datasets.imagenet import ImageNet
 
 
-DATASETS_AVAILABLE = ['mnist', 'cifar10', 'cifar100', 'fashion-mnist', 'tiny-imagenet', 'imagenet']
+DATASETS_AVAILABLE = ['mnist', 'cifar10', 'cifar10_benchmark', 'cifar100', 'fashion-mnist', 'tiny-imagenet', 'imagenet']
 
 
 class DatasetSelector:
@@ -19,6 +19,8 @@ class DatasetSelector:
     def get_dataset(self):
         if self.dataset_name == 'cifar10':
             return CIFAR10
+        elif self.dataset_name == 'cifar10_benchmark':
+            return CIFAR10Benchmark
         elif self.dataset_name == 'cifar100':
             return CIFAR100
         elif self.dataset_name == 'mnist':

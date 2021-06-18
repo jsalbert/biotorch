@@ -14,6 +14,7 @@ class Trainer:
                  mode,
                  loss_function,
                  optimizer,
+                 lr_scheduler,
                  train_dataloader,
                  val_dataloader,
                  device,
@@ -28,6 +29,7 @@ class Trainer:
         self.logs_dir = os.path.join(output_dir, 'logs')
         self.loss_function = loss_function
         self.optimizer = optimizer
+        self.lr_scheduler = lr_scheduler
         self.train_dataloader = train_dataloader
         self.val_dataloader = val_dataloader
         self.device = device
@@ -75,4 +77,7 @@ class Trainer:
                 self.writer.add_scalars('layer_alignment/train', layers_alignment, epoch)
 
             total_time = time.time() - t
+
+            # Update scheduler after training epoch
+            self.lr_scheduler.step()
             self.writer.add_scalar('time/train', total_time, epoch)
