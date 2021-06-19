@@ -35,7 +35,7 @@ _Lillicrap, T. P., Santoro, A., Marris, L., Akerman, C. J., & Hinton, G. (2020).
 | Method Name  | Acc@1 | Err@1| 
 | :---         |     :---      | :--- |
 | Backpropagation| 91.28 % | 8.72 % |
-| Feedback Alignment|      |        |
+| Feedback Alignment|   66.28%   |    33.72%    |
 | Direct Feedback Alignment|         |
 | Sign Symmetry|   |        |
 | Weight Mirroring|   |     |
