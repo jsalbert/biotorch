@@ -32,9 +32,9 @@ _Lillicrap, T. P., Santoro, A., Marris, L., Akerman, C. J., & Hinton, G. (2020).
 ## Benchmark
 
 ### CIFAR 10
-| Method Name  | Acc@1 |
+| Method Name  | Acc@1 | Err@1
 | :---         |     :---      |
-| Backpropagation| |
+| Backpropagation| 91.28 % | 8.72 %
 | Feedback Alignment|      |
 | Direct Feedback Alignment|         |
 | Sign Symmetry|   |
