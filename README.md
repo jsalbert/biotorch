@@ -29,7 +29,7 @@ _Lillicrap, T. P., Santoro, A., Marris, L., Akerman, C. J., & Hinton, G. (2020).
 | [Sign Symmetry](https://arxiv.org/abs/1811.03567)     |   |
 | [Weight Mirroring](https://arxiv.org/abs/1904.05391)     |   |
 
-## Benchmark
+## Benchmarks
 
 ### CIFAR 10
 | Method Name  | Acc@1 | Err@1| 
