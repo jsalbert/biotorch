@@ -37,7 +37,7 @@ The training procedure is as in the [ResNet paper by He, Kaiming, et al.](https:
 
 The model used to compare is ResNet-20. 
 
-For backpropagation the training was done as in ([He, Kaiming, et al.])(https://arxiv.org/abs/1512.03385), for the rest of methods we trained for 300 epochs, reducing the initial learning rate by a factor of 10 at 100, 200, and 250. The configuration file attached contain the exact hyperparameters used per method. 
+For backpropagation the training was done as in ([He, Kaiming, et al.](https://arxiv.org/abs/1512.03385)), for the rest of methods we trained for 300 epochs, reducing the initial learning rate by a factor of 10 at 100, 200, and 250. The configuration file attached contain the exact hyperparameters used per method. 
 
 | Method Name  | Acc@1 | Err@1| 
 | :---         |     :---      | :--- |
