@@ -1,12 +1,22 @@
-import torch.nn as nn
+import math
+import torch
+import biotorch.layers.fa as layers_fa
 
 
 from typing import Union
 from torch.nn.common_types import _size_2_t
-from biotorch.autograd.sign_2.conv import Conv2dGrad
+from biotorch.autograd.fa.conv import Conv2dGrad
 
 
-class Conv2d(nn.Conv2d):
+class Conv2d(layers_fa.Conv2d):
+    """
+    Implements the method from How Important Is Weight Symmetry in Backpropagation?
+
+    Batchwise Random Magnitude Sign-concordant Feedbacks (brSF):
+    weight_backward = M ◦ sign(weight), where M is redrawn after each update of W (i.e., each mini-batch).
+
+    (https://arxiv.org/pdf/1510.05067.pdf)
+    """
     def __init__(
             self,
             in_channels: int,
@@ -32,16 +42,16 @@ class Conv2d(nn.Conv2d):
             padding_mode
         )
 
-        nn.init.xavier_uniform_(self.weight)
-        self.bias_fa = None
-        if self.bias is not None:
-            nn.init.constant_(self.bias, 1)
-
     def forward(self, x):
-        # Sign Weight Transport Backward
+        wb = torch.Tensor(self.weight.size()).to(self.weight.device)
+        torch.nn.init.xavier_uniform_(wb)
+        self.weight_backward = torch.nn.Parameter(wb * torch.sign(self.weight), requires_grad=False)
+
         return Conv2dGrad.apply(x,
                                 self.weight,
+                                self.weight_backward,
                                 self.bias,
+                                None,
                                 self.stride,
                                 self.padding,
                                 self.dilation,

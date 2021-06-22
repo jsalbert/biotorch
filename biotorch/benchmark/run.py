@@ -38,7 +38,7 @@ class Benchmark:
 
             self.mode = self.model_config['mode']
             if self.mode not in self.mode_names:
-                raise ValueError("Mode not supported")
+                raise ValueError("Mode not {} supported".format(self.mode))
 
             options = models.__dict__[self.mode].__dict__
             self.model_names = sorted(name for name in options if name.islower() and not name.startswith("__")
@@ -78,7 +78,7 @@ class Benchmark:
                 self.model = models.__dict__[self.model_config['mode']].__dict__[
                     self.model_config['architecture']](pretrained=True, num_classes=self.num_classes)
             else:
-                print("=> Creating model from sratch '{}'".format(self.model_config['architecture']))
+                print("=> Creating model from scratch '{}'".format(self.model_config['architecture']))
                 self.model = models.__dict__[self.model_config['mode']].__dict__[
                     self.model_config['architecture']](num_classes=self.num_classes)
 

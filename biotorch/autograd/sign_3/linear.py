@@ -7,8 +7,8 @@ from torch import autograd
 class LinearGrad(autograd.Function):
     @staticmethod
     # same as reference linear function, but with additional fa tensor for backward
-    def forward(context, input, weight, bias=None):
-        context.save_for_backward(input, weight, bias)
+    def forward(context, input, weight, weight_backward, bias=None, bias_backward=None):
+        context.save_for_backward(input, weight, weight_backward, bias, bias_backward)
         output = input.mm(weight.t())
         if bias is not None:
             output += bias.unsqueeze(0).expand_as(output)
@@ -16,12 +16,12 @@ class LinearGrad(autograd.Function):
 
     @staticmethod
     def backward(context, grad_output):
-        input, weight, bias = context.saved_tensors
-        grad_input = grad_weight = grad_bias = None
+        input, weight, weight_backward, bias, bias_backward = context.saved_tensors
+        grad_input = grad_weight = grad_weight_backward = grad_bias = grad_bias_baackward = None
         # Gradient input
         if context.needs_input_grad[0]:
             # We use the sign of the weights to compute the gradients
-            grad_input = grad_output.mm(torch.sign(weight))
+            grad_input = grad_output.mm(torch.sign(weight) * weight_backward)
         # Gradient weights
         if context.needs_input_grad[1]:
             grad_weight = grad_output.t().mm(input)
@@ -29,4 +29,4 @@ class LinearGrad(autograd.Function):
         if bias is not None and context.needs_input_grad[2]:
             grad_bias = grad_output.sum(0).squeeze(0)
 
-        return grad_input, grad_weight, grad_bias
+        return grad_input, grad_weight, grad_weight_backward, grad_bias, grad_bias_baackward

@@ -1,31 +1,36 @@
 # Experiment Information
 experiment:
-  name: "CIFAR10_FA_Benchmark"
+  name: "experiment_CIFAR10_Benchmark_sign_2_resnet20_test_3"
   output_dir: "trained_models"
 
 # Dataset
 dataset:
-  name: "cifar10"
+  name: "cifar10_benchmark"
 
 # Model
 model:
-  architecture: "resnet18"
-  mode: "fa"
+  architecture: "resnet20"
+  mode: "sign_2"
   pretrained: false
   # checkpoint:
 
 # Training Parameters
 training:
   hyperparameters:
-    epochs: 10
-    batch_size: 64
-    target_size: 224
+    epochs: 300
+    batch_size: 128
+    target_size: 32
 
   optimizer:
-    type: "RMSProp"
-    lr: 0.001
-    weight_decay: 0
-    momentum: 0
+    type: "SGD"
+    lr: 0.01
+    weight_decay: 0.0001
+    momentum: 0.9
+
+  lr_scheduler:
+    type: "multistep_lr"
+    gamma: 0.1
+    milestones: [100, 200, 250]
 
   metrics:
     top_k: 5

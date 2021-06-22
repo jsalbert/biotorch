@@ -37,9 +37,26 @@ class Trainer:
         self.multi_gpu = multi_gpu
         self.display_iterations = display_iterations
         self.writer = SummaryWriter(self.logs_dir)
+        self.layer_alignment_modes = ['weight_mirroring', 'fa', 'sign_1', 'sign_2', 'sign_3']
 
     def run(self):
         self.best_acc = 0.0
+
+        # Warming-up: If weight mirroring we enter "mirror mode" for a few epochs
+        if self.mode == 'weight_mirroring':
+            print('Warming up, Mirroring mode for a few epochs...')
+            iterations_epoch = len(self.train_dataloader) // self.train_dataloader.batch_size
+            noise_size = (self.train_dataloader.batch_size,) + self.train_dataloader.dataset[0][0].size()
+            x = torch.randn(noise_size).to(self.device)
+            for i in range(0, iterations_epoch * 20):
+                if self.multi_gpu:
+                    self.model.module.mirror_weights(x, growth_control=True)
+                else:
+                    self.model.mirror_weights(x, growth_control=True)
+            layers_alignment = compute_angles_module(self.model)
+            print(layers_alignment)
+            print('Warm-up completed')
+
         for epoch in range(self.epochs):
             t = time.time()
             acc, loss = train(
@@ -49,6 +66,7 @@ class Trainer:
                 optimizer=self.optimizer,
                 train_dataloader=self.train_dataloader,
                 device=self.device,
+                multi_gpu=self.multi_gpu,
                 epoch=epoch
             )
             self.writer.add_scalar('accuracy/train', acc, epoch)
@@ -66,13 +84,14 @@ class Trainer:
             # Remember best acc@1 and save checkpoint
             if acc > self.best_acc:
                 self.best_acc = max(acc, self.best_acc)
+                print('New best accuracy reached: {} \nSaving best accuracy model...'.format(self.best_acc))
                 if self.multi_gpu:
-                    torch.save(self.model, os.path.join(self.output_dir, 'model_best_acc.pth'))
+                    torch.save(self.model.module, os.path.join(self.output_dir, 'model_best_acc.pth'))
                 else:
                     torch.save(self.model, os.path.join(self.output_dir, 'model_best_acc.pth'))
             torch.save(self.model, os.path.join(self.output_dir, 'latest_model.pth'))
 
-            if self.mode == 'weight_mirroring':
+            if self.mode in self.layer_alignment_modes:
                 layers_alignment = compute_angles_module(self.model)
                 self.writer.add_scalars('layer_alignment/train', layers_alignment, epoch)
 

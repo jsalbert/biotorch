@@ -4,6 +4,9 @@ from torch import autograd
 
 
 class Conv2dGrad(autograd.Function):
+    """
+    Autograd Function that Does a backward pass using the weight_backward matrix of the layer
+    """
     @staticmethod
     def forward(context, input, weight, weight_backward, bias, bias_backward, stride, padding, dilation, groups):
         context.stride, context.padding, context.dilation, context.groups = stride, padding, dilation, groups

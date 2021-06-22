@@ -10,6 +10,7 @@ def train(model,
           train_dataloader,
           device,
           epoch,
+          multi_gpu,
           top_k=5,
           display_iterations=500):
 
@@ -33,7 +34,7 @@ def train(model,
         # Send inputs to device
         inputs, targets = inputs.to(device), targets.to(device)
         # Get outputs from the model
-        if mode == 'DFA':
+        if mode == 'dfa':
             outputs = model(inputs, targets, loss_function)
         else:
             outputs = model(inputs)
@@ -55,9 +56,14 @@ def train(model,
         # Update weights
         optimizer.step()
 
-        if mode == 'weight_transport':
-            model.mirror_weights(torch.randn(inputs.size()))
-            # do something
+        if mode == 'weight_mirroring':
+            if multi_gpu:
+                model.module.mirror_weights(torch.randn(inputs.size()).to(device),
+                                            growth_control=True)
+            else:
+                model.mirror_weights(torch.randn(inputs.size()).to(device),
+                                     growth_control=True)
+
         # Measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()

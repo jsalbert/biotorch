@@ -2,8 +2,11 @@ from torch import autograd
 
 
 class LinearGrad(autograd.Function):
+    """
+    Autograd Function that Does a backward pass using the weight_backward matrix of the layer
+    """
     @staticmethod
-    # same as reference linear function, but with additional fa tensor for backward
+    # Same as reference linear function, but with additional weight tensor for backward
     def forward(context, input, weight, weight_backward, bias=None, bias_backward=None):
         context.save_for_backward(input, weight, weight_backward, bias, bias_backward)
         output = input.mm(weight.t())
@@ -18,7 +21,7 @@ class LinearGrad(autograd.Function):
 
         # Gradient input
         if context.needs_input_grad[0]:
-            # Use the FA constant weight matrix to compute the gradient
+            # Use the weight_backward matrix to compute the gradient
             grad_input = grad_output.mm(weight_backward)
         # Gradient weights
         if context.needs_input_grad[1]:

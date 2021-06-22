@@ -63,7 +63,7 @@ class BasicBlock(nn.Module):
         return out
 
     def mirror_weights(self, x: Tensor,
-                       mirror_learning_rate: float = 0.01,
+                       mirror_learning_rate: float = 0.1,
                        noise_amplitude: float = 0.1,
                        growth_control: bool = False,
                        damping_factor: float = 0.5):
@@ -78,7 +78,7 @@ class BasicBlock(nn.Module):
                             damping_factor=damping_factor)
 
         output_noise = self.bn1(output_noise)
-        output_noise = self.relu(output_noise)
+        output_noise = self.relu1(output_noise)
 
         # Create input noise
         input_noise = (noise_amplitude * (torch.randn(output_noise.size()))).to(x.device)
@@ -132,49 +132,50 @@ class ResNet(nn.Module):
         return out
 
     def mirror_weights(self, x: Tensor,
-                       mirror_learning_rate: float = 0.01,
+                       mirror_learning_rate: float = 0.1,
                        noise_amplitude: float = 0.1,
                        growth_control: bool = False,
                        damping_factor: float = 0.5):
-        # Create input noise
-        input_noise = (noise_amplitude * (torch.randn(x.size()))).to(x.device)
-        output_noise = self.conv1(input_noise)
-        # Compute noise correlation and update the backward weight matrix (Backward Matrix)
-        self.conv1.update_B(x=input_noise, y=output_noise,
-                            mirror_learning_rate=mirror_learning_rate,
-                            growth_control=growth_control,
-                            damping_factor=damping_factor)
+        with torch.no_grad():
+            # Create input noise
+            input_noise = (noise_amplitude * (torch.randn(x.size()))).to(x.device)
+            output_noise = self.conv1(input_noise)
+            # Compute noise correlation and update the backward weight matrix (Backward Matrix)
+            self.conv1.update_B(x=input_noise, y=output_noise,
+                                mirror_learning_rate=mirror_learning_rate,
+                                growth_control=growth_control,
+                                damping_factor=damping_factor)
 
-        output_noise = self.bn1(output_noise)
-        output_noise = self.relu(output_noise)
+            output_noise = self.bn1(output_noise)
+            output_noise = self.relu(output_noise)
 
-        output_noise = self.layer1.mirror_weights(output_noise,
-                                                  mirror_learning_rate,
-                                                  noise_amplitude,
-                                                  growth_control,
-                                                  damping_factor)
-        output_noise = self.layer2.mirror_weights(output_noise,
-                                                  mirror_learning_rate,
-                                                  noise_amplitude,
-                                                  growth_control,
-                                                  damping_factor)
-        output_noise = self.layer3.mirror_weights(output_noise,
-                                                  mirror_learning_rate,
-                                                  noise_amplitude,
-                                                  growth_control,
-                                                  damping_factor)
+            output_noise = self.layer1.mirror_weights(output_noise,
+                                                      mirror_learning_rate,
+                                                      noise_amplitude,
+                                                      growth_control,
+                                                      damping_factor)
+            output_noise = self.layer2.mirror_weights(output_noise,
+                                                      mirror_learning_rate,
+                                                      noise_amplitude,
+                                                      growth_control,
+                                                      damping_factor)
+            output_noise = self.layer3.mirror_weights(output_noise,
+                                                      mirror_learning_rate,
+                                                      noise_amplitude,
+                                                      growth_control,
+                                                      damping_factor)
 
-        output_noise = F.avg_pool2d(output_noise, output_noise.size()[3])
-        output_noise = output_noise.view(out.size(0), -1)
+            output_noise = F.avg_pool2d(output_noise, output_noise.size()[3])
+            output_noise = output_noise.view(output_noise.size(0), -1)
 
-        # Create input noise
-        input_noise = (noise_amplitude * (torch.randn(output_noise.size()))).to(x.device)
-        output_noise = self.fc(input_noise)
-        # Compute noise correlation and update the backward weight matrix (Backward Matrix)
-        self.fc.update_B(x=input_noise, y=output_noise,
-                         mirror_learning_rate=mirror_learning_rate,
-                         growth_control=growth_control,
-                         damping_factor=damping_factor)
+            # Create input noise
+            input_noise = (noise_amplitude * (torch.randn(output_noise.size()))).to(x.device)
+            output_noise = self.fc(input_noise)
+            # Compute noise correlation and update the backward weight matrix (Backward Matrix)
+            self.fc.update_B(x=input_noise, y=output_noise,
+                             mirror_learning_rate=mirror_learning_rate,
+                             growth_control=growth_control,
+                             damping_factor=damping_factor)
 
 
 def resnet20(pretrained: bool = False, progress: bool = True, num_classes: int = 10):

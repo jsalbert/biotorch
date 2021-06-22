@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from typing import Type, Any, Callable, Union, List, Optional
 
 """
@@ -67,7 +68,7 @@ class BasicBlock(nn.Module):
     def forward(self, x):
         out = self.conv1(x)
         out = self.bn1(out)
-        out = self.relu(out)
+        out = self.relu1(out)
         out = self.conv2(out)
         out = self.bn2(out)
         out += self.shortcut(x)

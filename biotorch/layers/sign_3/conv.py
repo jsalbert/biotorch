@@ -1,13 +1,22 @@
+import math
 import torch
-import torch.nn as nn
+import biotorch.layers.fa as layers_fa
 
 
 from typing import Union
 from torch.nn.common_types import _size_2_t
-from biotorch.autograd.sign_3.conv import Conv2dGrad
+from biotorch.autograd.fa.conv import Conv2dGrad
 
 
-class Conv2d(nn.Conv2d):
+class Conv2d(layers_fa.Conv2d):
+    """
+    Implements the method from How Important Is Weight Symmetry in Backpropagation?
+
+    Fixed Random Magnitude Sign-concordant Feedbacks (frSF):
+    weight_backward = M ◦ sign(weight), where M is initialized once and fixed throughout each experiment
+
+    (https://arxiv.org/pdf/1510.05067.pdf)
+    """
     def __init__(
             self,
             in_channels: int,
@@ -33,22 +42,12 @@ class Conv2d(nn.Conv2d):
             padding_mode
         )
 
-        nn.init.xavier_uniform_(self.weight)
-        self.weight_backward = nn.Parameter(torch.Tensor(self.weight.size()), requires_grad=False)
-        nn.init.xavier_uniform_(self.weight_backward)
-        self.bias_backward = None
-        if self.bias is not None:
-            self.bias_backward = nn.Parameter(torch.Tensor(self.bias.size()), requires_grad=False)
-            nn.init.constant_(self.bias, 1)
-            nn.init.constant_(self.bias_backward, 1)
-
     def forward(self, x):
-        # Sign Weight Transport Backward
         return Conv2dGrad.apply(x,
                                 self.weight,
-                                self.weight_backward,
+                                self.weight_backward * torch.sign(self.weight),
                                 self.bias,
-                                self.bias_backward,
+                                None,
                                 self.stride,
                                 self.padding,
                                 self.dilation,

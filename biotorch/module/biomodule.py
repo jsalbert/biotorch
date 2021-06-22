@@ -31,6 +31,6 @@ class BioModule(nn.Module):
             loss = loss_function(output, targets)
             loss_gradient = grad(loss, output, retain_graph=True)[0]
             # Broadcast gradient of the loss to every layer
-            for layer in self.model.modules():
+            for layer in self.module.modules():
                 layer.loss_gradient = loss_gradient
         return output

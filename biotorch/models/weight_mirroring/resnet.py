@@ -94,7 +94,7 @@ class BasicBlock(nn.Module):
         return out
 
     def mirror_weights(self, x: Tensor,
-                       mirror_learning_rate: float = 0.01,
+                       mirror_learning_rate: float = 0.1,
                        noise_amplitude: float = 0.1,
                        growth_control: bool = False,
                        damping_factor: float = 0.5):
@@ -197,7 +197,7 @@ class Bottleneck(nn.Module):
         return out
 
     def mirror_weights(self, x: Tensor,
-                       mirror_learning_rate: float = 0.01,
+                       mirror_learning_rate: float = 0.1,
                        noise_amplitude: float = 0.1,
                        growth_control: bool = False,
                        damping_factor: float = 0.5):

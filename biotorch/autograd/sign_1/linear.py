@@ -1,3 +1,4 @@
+import math
 import torch
 
 from torch import autograd
@@ -28,7 +29,18 @@ class LinearGrad(autograd.Function):
         # Gradient input
         if context.needs_input_grad[0]:
             # We use the sign of the weights to compute the gradients
-            grad_input = grad_output.mm(torch.sign(weight))
+            # To avoid Exploding Gradients, we scale the sign of the weights by a scaling factor (https://arxiv.org/pdf/1811.03567.pdf)
+            # scaling_factor = 1 / math.sqrt(weight.size()[0])
+            fan_in, fan_out = torch.nn.init._calculate_fan_in_and_fan_out(weight)
+            scaling_factor = math.sqrt(2.0 / float(fan_in + fan_out))
+            grad_input = grad_output.mm(torch.sign(weight) * scaling_factor)
+            # To avoid Exploding Gradients, we apply BN + BM
+            # Batch Normalization
+            # grad_input = torch.nn.functional.batch_norm(grad_input,
+            #                                             torch.mean(grad_input, axis=0),
+            #                                             torch.var(grad_input, axis=0))
+            # Batch Manhattan
+            # grad_input = torch.sign(grad_input)
         # Gradient weights
         if context.needs_input_grad[1]:
             grad_weight = grad_output.t().mm(input)

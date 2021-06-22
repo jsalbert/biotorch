@@ -79,7 +79,7 @@ class CIFAR10(Dataset):
 
 class CIFAR10Benchmark(Dataset):
     def __str__(self):
-        return 'CIFAR-10 Dataset'
+        return 'CIFAR-10 Benchmark Dataset'
 
     def __init__(self, target_size, dataset_path='./datasets/cifar10', train_transforms=None, test_transforms=None):
         self.mean = (0.4914, 0.4821, 0.4465)

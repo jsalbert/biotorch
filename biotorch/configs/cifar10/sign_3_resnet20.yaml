@@ -1,31 +1,36 @@
 # Experiment Information
 experiment:
-  name: "experiment_CIFAR10_Benchmark_weight_mirroring_resnet20"
+  name: "experiment_CIFAR10_Benchmark_sign_3_resnet20_final_4"
   output_dir: "trained_models"
 
 # Dataset
 dataset:
-  name: "cifar10"
+  name: "cifar10_benchmark"
 
 # Model
 model:
   architecture: "resnet20"
-  mode: "weight_mirroring"
+  mode: "sign_3"
   pretrained: false
   # checkpoint:
 
 # Training Parameters
 training:
   hyperparameters:
-    epochs: 100
+    epochs: 300
     batch_size: 128
     target_size: 32
 
   optimizer:
-    type: "RMSProp"
-    lr: 0.01
+    type: "SGD"
+    lr: 0.001
     weight_decay: 0.00001
-    momentum: 0
+    momentum: 0.9
+
+  lr_scheduler:
+    type: "multistep_lr"
+    gamma: 0.1
+    milestones: [100, 200, 250]
 
   metrics:
     top_k: 5
