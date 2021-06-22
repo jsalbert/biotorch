@@ -21,9 +21,32 @@ During learning, the brain modifies synapses to improve behaviour. In the cortex
 _Lillicrap, T. P., Santoro, A., Marris, L., Akerman, C. J., & Hinton, G. (2020). Backpropagation and the brain. Nature Reviews Neuroscience, 21(6), 335-346._
 
 ## Methods Supported
-| Name  | Description |
-| :---         |     :---      |
-| [Feedback Alignment](https://arxiv.org/abs/1411.0247)    |      |
-| [Direct Feedback Alignment](https://arxiv.org/abs/1609.01596)    |         |
-| [Sign Symmetry](https://arxiv.org/abs/1811.03567)     |   |
-| [Weight Mirrors](https://arxiv.org/abs/1904.05391)     |   |
+
+| Name  | Mode | Official Implementations|
+| :---         |     :---      | :---      |
+| [Feedback Alignment](https://arxiv.org/abs/1411.0247)    | `'fa'`     |[]|
+| [Direct Feedback Alignment](https://arxiv.org/abs/1609.01596)    |   `'dfa'`     |[[Torch]](https://github.com/anokland/dfa-torch) |
+| Sign Symmetry([[1]](https://arxiv.org/pdf/1510.05067.pdf), [[2]](https://arxiv.org/abs/1811.03567))    | `['sign_1', 'sign_2', 'sign_3']`  | [[PyTorch]](https://github.com/willwx/sign-symmetry)|
+| [Weight Mirroring](https://arxiv.org/abs/1904.05391)     |  `'weight_mirroring'` | [[Python]](https://github.com/makrout/Deep-Learning-without-Weight-Transport) |
+
+## Benchmarks
+
+### CIFAR 10
+
+The training procedure is as in the [ResNet paper by He, Kaiming, et al.](https://arxiv.org/abs/1512.03385), the training dataset is split into a 45k training and 5k validation partitions. The model with best validation accuracy is then benchmarked with the testing set of 10k samples. 
+
+The model used to compare is ResNet-20. 
+
+For backpropagation the training was done as in ([He, Kaiming, et al.](https://arxiv.org/abs/1512.03385)), for the rest of methods we trained for 300 epochs, reducing the initial learning rate by a factor of 10 at 100, 200, and 250. The configuration file attached contain the exact hyperparameters used per method. 
+
+| Method Name  | Acc@1 | Err@1| 
+| :---         |     :---      | :--- |
+| Backpropagation| 91.28 % | 8.72 % |
+| Feedback Alignment|   67.10 %   |    32.90 %    |
+| Direct Feedback Alignment|         |
+| Sign Symmetry (1) (uSF)| 85.18 %  |  14.82 %    |
+| Sign Symmetry (2) (brSF)|  31.07 %  |  69.93 %      |
+| Sign Symmetry (3) (frSF)|  %  |  %      |
+| Weight Mirroring| %  |  %   |
+
+
