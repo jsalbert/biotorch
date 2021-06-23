@@ -42,7 +42,7 @@ For backpropagation the training was done as in ([He, Kaiming, et al.](https://a
 | :---         |     :---      | :--- |
 | Backpropagation| 91.28 % | 8.72 % |
 | Feedback Alignment|   67.10 %   |    32.90 %    |
-| Direct Feedback Alignment|   65.49 %      | 44.51 % |
+| Direct Feedback Alignment|   65.49 %      | 34.51 % |
 | Sign Symmetry (1) (uSF)| 85.18 %  |  14.82 %    |
 | Sign Symmetry (2) (brSF)|  31.07 %  |  68.93 %      |
 | Sign Symmetry (3) (frSF)|  47.30 %  |  52.70 %      |
