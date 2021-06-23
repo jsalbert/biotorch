@@ -35,10 +35,10 @@ _Lillicrap, T. P., Santoro, A., Marris, L., Akerman, C. J., & Hinton, G. (2020).
 
 The training procedure is as in the [ResNet paper by He, Kaiming, et al.](https://arxiv.org/abs/1512.03385), the training dataset is split into a 45k training and 5k validation partitions. The model with best validation accuracy is then benchmarked with the testing set of 10k samples. 
 
-The model used to compare is ResNet-20. 
+The model used to compare is **ResNet-20**. 
 
 For backpropagation the training was done as in ([He, Kaiming, et al.](https://arxiv.org/abs/1512.03385)), for the rest of methods we trained with batch size of 128, for 300 epochs reducing the initial learning rate by a factor of 10 at 100, 200, and 250. The configuration file attached contain the exact hyperparameters used per method. 
-| Method Name  | Acc@1 | Err@1| 
+| Method  | Acc@1 | Err@1| 
 | :---         |     :---      | :--- |
 | Backpropagation| 91.28 % | 8.72 % |
 | Feedback Alignment|   67.10 %   |    32.90 %    |
