@@ -37,7 +37,7 @@ The training procedure is as in the [ResNet paper by He, Kaiming, et al.](https:
 
 The model used to compare is ResNet-20. 
 
-For backpropagation the training was done as in ([He, Kaiming, et al.](https://arxiv.org/abs/1512.03385)), for the rest of methods we trained with batch size of 128, for 300 epochs reducing the initial learning rate by a factor of 10 at 100, 200, and 250. The configuration file attached contain the exact hyperparameters used per method. 
+For backpropagation the training was done as in ([He, Kaiming, et al.](https://arxiv.org/abs/1512.03385)), for the rest of methods we trained with batch size of 128, for 300 epochs reducing the initial learning rate by a factor of 10 at 100, 200, and 250. The configuration file attached contain the exact hyperparameters used per method. *
 
 | Method Name  | Acc@1 | Err@1| 
 | :---         |     :---      | :--- |
@@ -49,4 +49,7 @@ For backpropagation the training was done as in ([He, Kaiming, et al.](https://a
 | Sign Symmetry (3) (frSF)|  47.30 %  |  52.70 %      |
 | Weight Mirroring| %  |  %   |
 
+* There has not been a large hyperparameter search, just enough to make methods converge and benchmark against backprop in very similar training conditions. 
+
+### ImageNet
 
