@@ -13,6 +13,7 @@ class CIFAR100(Dataset):
         self.mean = (0.5071, 0.4867, 0.4408)
         self.std = (0.2675, 0.2565, 0.2761)
         self.num_classes = 100
+
         super(CIFAR100, self).__init__(target_size=target_size,
                                        dataset_path=dataset_path,
                                        mean=self.mean,

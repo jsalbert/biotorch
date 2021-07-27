@@ -18,7 +18,6 @@ class LinearGrad(autograd.Function):
     def backward(context, grad_output):
         input, weight, weight_backward, bias, bias_backward = context.saved_tensors
         grad_input = grad_weight = grad_weight_backward = grad_bias = grad_bias_backward = None
-
         # Gradient input
         if context.needs_input_grad[0]:
             # Use the weight_backward matrix to compute the gradient

@@ -42,4 +42,4 @@ training:
 
 # Infrastructure
 infrastructure:
-  num_gpus: 2
+  gpus: 2

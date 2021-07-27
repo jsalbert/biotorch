@@ -67,7 +67,8 @@ class Trainer:
                 train_dataloader=self.train_dataloader,
                 device=self.device,
                 multi_gpu=self.multi_gpu,
-                epoch=epoch
+                epoch=epoch,
+                display_iterations=self.display_iterations
             )
             self.writer.add_scalar('accuracy/train', acc, epoch)
             self.writer.add_scalar('loss/train', loss, epoch)

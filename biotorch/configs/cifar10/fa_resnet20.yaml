@@ -1,11 +1,12 @@
 # Experiment Information
 experiment:
-  name: "experiment_CIFAR10_Benchmark_FA_resnet20_final"
+  name: "CIFAR10_Benchmark_FA_resnet20"
   output_dir: "trained_models"
 
 # Dataset
-dataset:
-  name: "cifar10_benchmark"
+data:
+  dataset: "cifar10_benchmark"
+  dataset_path: null
 
 # Model
 model:
@@ -42,4 +43,4 @@ training:
 
 # Infrastructure
 infrastructure:
-  num_gpus: 2
+  gpus: 2

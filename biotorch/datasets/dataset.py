@@ -18,7 +18,7 @@ class Dataset(object):
         self.test_transforms = test_transforms
 
         default_transforms = [
-            transforms.Resize(self.target_size),
+            transforms.Resize((self.target_size, self.target_size)),
             transforms.ToTensor(),
         ]
 

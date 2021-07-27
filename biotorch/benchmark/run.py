@@ -1,6 +1,7 @@
 import os
 import torch
 import shutil
+import argparse
 import torch.nn as nn
 import biotorch.models as models
 import torch.backends.cudnn as cudnn
@@ -24,14 +25,14 @@ class Benchmark:
             # Validate config file
             validate_config(self.config_file, 'benchmark', defaults=True)
             # Parse config file
-            self.n_gpus = self.config_file['infrastructure']['num_gpus']
+            self.gpus = self.config_file['infrastructure']['gpus']
             self.hyperparameters = self.config_file['training']['hyperparameters']
             self.metrics = self.config_file['training']['metrics']
             self.optimizer_config = self.config_file['training']['optimizer']
             self.loss_function_config = self.config_file['training']['loss_function']
             self.lr_scheduler_config = self.config_file['training']['lr_scheduler']
             self.model_config = self.config_file['model']
-            self.dataset_config = self.config_file['dataset']
+            self.data_config = self.config_file['data']
 
             self.mode_names = sorted(name for name in models.__dict__ if name.islower() and not name.startswith("__")
                                      and isinstance(models.__dict__[name], ModuleType))
@@ -50,12 +51,14 @@ class Benchmark:
             shutil.copy2(self.config_file_path, os.path.join(self.output_dir, 'config.yaml'))
 
     def run(self):
-        if self.n_gpus == 0:
+        if self.gpus == -1:
             self.device = 'cpu'
-        elif self.n_gpus > 0 and not torch.cuda.is_available():
-            raise ValueError('You selected {} GPUs but there are no GPUs available'.format(self.n_gpus))
+        elif self.gpus >= 0 and not torch.cuda.is_available():
+            raise ValueError('You selected {} GPUs but there are no GPUs available'.format(self.gpus))
         else:
             self.device = 'cuda'
+            if isinstance(self.gpus, int):
+                self.device += ':' + str(self.gpus)
 
         cudnn.benchmark = True
 
@@ -63,10 +66,14 @@ class Benchmark:
         self.epochs = self.hyperparameters['epochs']
         self.batch_size = self.hyperparameters['batch_size']
         self.target_size = self.hyperparameters['target_size']
+        self.display_iterations = self.metrics['display_iterations']
 
         # Create dataset
-        self.dataset_creator = DatasetSelector(self.dataset_config['name']).get_dataset()
-        self.dataset = self.dataset_creator(self.target_size)
+        self.dataset_creator = DatasetSelector(self.data_config['dataset']).get_dataset()
+        if self.data_config['dataset_path'] is not None:
+            self.dataset = self.dataset_creator(self.target_size,  dataset_path=self.data_config['dataset_path'])
+        else:
+            self.dataset = self.dataset_creator(self.target_size)
         self.train_dataloader = self.dataset.create_train_dataloader(self.batch_size)
         self.val_dataloader = self.dataset.create_val_dataloader(self.batch_size)
         self.num_classes = self.dataset.num_classes
@@ -87,8 +94,8 @@ class Benchmark:
 
         self.model.to(self.device)
 
-        if self.n_gpus > 1:
-            self.model = nn.DataParallel(self.model, list(range(0, self.n_gpus)))
+        if isinstance(self.gpus, list):
+            self.model = nn.DataParallel(self.model, self.gpus)
             self.multi_gpu = True
 
         self.loss_function = select_loss_function(self.loss_function_config)
@@ -108,7 +115,7 @@ class Benchmark:
                           epochs=self.epochs,
                           output_dir=self.output_dir,
                           multi_gpu=self.multi_gpu,
-                          display_iterations=500)
+                          display_iterations=self.display_iterations)
         trainer.run()
 
 
@@ -116,9 +123,10 @@ def __main__():
     parser = argparse.ArgumentParser(
         description='BioTorch'
     )
-    parser.add_argument('config_file')
+    parser.add_argument('--config_file', help="Path to the configuration file")
 
     try:
+        args = parser.parse_args()
         benchmark = Benchmark(args.config_file)
         benchmark.run()
 

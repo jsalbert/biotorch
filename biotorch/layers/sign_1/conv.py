@@ -43,6 +43,7 @@ class Conv2d(layers_fa.Conv2d):
         )
         fan_in, fan_out = torch.nn.init._calculate_fan_in_and_fan_out(self.weight)
         self.scaling_factor = math.sqrt(2.0 / float(fan_in + fan_out))
+        self.register_backward_hook(self.gradient_clip)
 
     def forward(self, x):
         # To avoid Exploding Gradients, we scale the sign of the weights by a scaling factor
@@ -58,3 +59,11 @@ class Conv2d(layers_fa.Conv2d):
                                 self.padding,
                                 self.dilation,
                                 self.groups)
+
+    @staticmethod
+    def gradient_clip(module, grad_input, grad_output):
+        grad_input = list(grad_input)
+        for i in range(len(grad_input)):
+            if grad_input[i] is not None:
+                grad_input[i] = torch.clamp(grad_input[i], -1, 1)
+        return tuple(grad_input)

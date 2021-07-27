@@ -32,26 +32,29 @@
     "infrastructure": {
       "type": "object",
       "properties": {
-        "num_gpus": {
-          "type": "integer"
+        "gpus": {
+          "type": ["integer", "array"]
         }
       },
       "additionalProperties": false,
       "required": [
-        "num_gpus"
+        "gpus"
       ]
     }
   },
-  "dataset": {
+  "data": {
     "type": "object",
     "properties": {
-      "name": {
+      "dataset": {
+        "type": "string"
+      },
+      "dataset_path": {
         "type": "string"
       }
-    },
+      },
     "additionalProperties": false,
     "required": [
-      "name"
+      "dataset"
     ]
   },
   "training": {
@@ -232,10 +235,12 @@
       "mode": {
         "type": "string",
         "enum": [
-          "BP",
-          "FA",
-          "DFA",
-          "sign"
+          "backpropagation",
+          "fa",
+          "dfa",
+          "sign_1",
+          "sign_2",
+          "sign_3"
         ]
       },
       "pretrained": {
@@ -291,7 +296,7 @@
       "infrastructure",
       "training",
       "model",
-      "dataset"
+      "data"
     ]
   }
 }

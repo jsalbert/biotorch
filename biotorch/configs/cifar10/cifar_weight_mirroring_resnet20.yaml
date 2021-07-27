@@ -18,7 +18,7 @@ model:
 training:
   hyperparameters:
     epochs: 120
-    batch_size: 128
+    batch_size: 256
     target_size: 32
 
   optimizer:
@@ -34,7 +34,7 @@ training:
 
   metrics:
     top_k: 5
-    display_iterations: 500
+    display_iterations: 50
 
   loss_function:
     name: "cross_entropy"
@@ -42,4 +42,4 @@ training:
 
 # Infrastructure
 infrastructure:
-  num_gpus: 2
+  gpus: 2

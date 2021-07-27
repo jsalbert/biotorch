@@ -17,8 +17,20 @@ class Linear(layers_fa.Linear):
         super(Linear, self).__init__(in_features, out_features, bias)
         fan_in, fan_out = torch.nn.init._calculate_fan_in_and_fan_out(self.weight)
         self.scaling_factor = math.sqrt(2.0 / float(fan_in + fan_out))
+        self.register_backward_hook(self.gradient_clip)
 
     def forward(self, x):
         # Linear Sign Weight Transport Backward
         self.weight_backward = torch.nn.Parameter(self.scaling_factor * torch.sign(self.weight))
         return LinearGrad.apply(x, self.weight, self.weight_backward, self.bias, None)
+
+    @staticmethod
+    def gradient_clip(module, grad_input, grad_output):
+        grad_input = list(grad_input)
+        for i in range(len(grad_input)):
+            if grad_input[i] is not None:
+                grad_input[i] = torch.clamp(grad_input[i], -1, 1)
+        return tuple(grad_input)
+
+
+

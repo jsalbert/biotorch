@@ -17,7 +17,7 @@ model:
 # Training Parameters
 training:
   hyperparameters:
-    epochs: 200
+    epochs: 300
     batch_size: 128
     target_size: 32
 
@@ -42,4 +42,4 @@ training:
 
 # Infrastructure
 infrastructure:
-  num_gpus: 1
+  gpus: 1
