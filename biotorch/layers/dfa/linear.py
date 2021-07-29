@@ -5,8 +5,21 @@ from biotorch.autograd.dfa.linear import LinearGrad
 
 
 class Linear(nn.Linear):
-    def __init__(self, in_features: int, out_features: int, output_dim: int, bias: bool = True) -> None:
+    def __init__(self, in_features: int, out_features: int, output_dim: int, bias: bool = True,
+                 layer_config: dict = None) -> None:
         super(Linear, self).__init__(in_features, out_features, bias)
+
+        self.layer_config = layer_config
+
+        if "options" not in self.layer_config:
+            self.layer_config["options"] = {
+                "constrain_weights": False,
+                "scaling_factor": False,
+                "gradient_clip": None
+            }
+
+        self.options = self.layer_config["options"]
+
         self.weight_dfa = nn.Parameter(torch.Tensor(size=(output_dim, self.in_features)), requires_grad=False)
         nn.init.xavier_uniform_(self.weight)
         nn.init.xavier_uniform_(self.weight_dfa)
@@ -16,11 +29,27 @@ class Linear(nn.Linear):
             self.bias_dfa = nn.Parameter(torch.Tensor(size=(output_dim, self.in_features)), requires_grad=False)
             nn.init.constant_(self.bias, 1)
             nn.init.constant_(self.bias_dfa, 1)
+
+        if self.options["constrain_weights"]:
+            with torch.no_grad():
+                self.norm_initial_weights = torch.linalg.norm(self.weight)
+
+        if self.options["scaling_factor"]:
+            fan_in, fan_out = torch.nn.init._calculate_fan_in_and_fan_out(self.weight)
+            self.scaling_factor = math.sqrt(2.0 / float(fan_in + fan_out))
+
         # Will use gradients computed in the backward hook
         self.register_backward_hook(self.dfa_backward_hook)
 
     def forward(self, x):
         # Regular BackPropagation Forward-Backward
+        with torch.no_grad():
+            if self.options["constrain_weights"]:
+                self.weight *= self.norm_initial_weights / torch.linalg.norm(self.weight)
+
+            if self.options["scaling_factor"]:
+                self.weight_dfa = torch.nn.Parameter(self.scaling_factor * self.weight_dfa, requires_grad=False)
+
         return LinearGrad.apply(x, self.weight, self.bias)
 
     @staticmethod

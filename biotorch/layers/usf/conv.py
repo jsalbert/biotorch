@@ -1,6 +1,5 @@
-import math
 import torch
-import biotorch.layers.fa as layers_fa
+import biotorch.layers.fa_constructor as fa_constructor
 
 
 from typing import Union
@@ -8,12 +7,12 @@ from torch.nn.common_types import _size_2_t
 from biotorch.autograd.fa.conv import Conv2dGrad
 
 
-class Conv2d(layers_fa.Conv2d):
+class Conv2d(fa_constructor.Conv2d):
     """
     Implements the method from How Important Is Weight Symmetry in Backpropagation?
 
-    Fixed Random Magnitude Sign-concordant Feedbacks (frSF):
-    weight_backward = M ◦ sign(weight), where M is initialized once and fixed throughout each experiment
+    Uniform Sign-concordant Feedbacks (uSF):
+    Backward Weights = sign(W)
 
     (https://arxiv.org/pdf/1510.05067.pdf)
     """
@@ -27,8 +26,12 @@ class Conv2d(layers_fa.Conv2d):
             dilation: _size_2_t = 1,
             groups: int = 1,
             bias: bool = True,
-            padding_mode: str = 'zeros'
+            padding_mode: str = 'zeros',
+            layer_config: dict = None
     ):
+        if layer_config is None:
+            layer_config = {}
+        layer_config["type"] = "usf"
 
         super(Conv2d, self).__init__(
             in_channels,
@@ -39,16 +42,6 @@ class Conv2d(layers_fa.Conv2d):
             dilation,
             groups,
             bias,
-            padding_mode
+            padding_mode,
+            layer_config
         )
-
-    def forward(self, x):
-        return Conv2dGrad.apply(x,
-                                self.weight,
-                                self.weight_backward * torch.sign(self.weight),
-                                self.bias,
-                                None,
-                                self.stride,
-                                self.padding,
-                                self.dilation,
-                                self.groups)

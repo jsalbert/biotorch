@@ -1,6 +1,6 @@
 import math
 import torch
-import biotorch.layers.fa as layers_fa
+import biotorch.layers.fa_constructor as fa_constructor
 
 
 from typing import Union
@@ -8,7 +8,7 @@ from torch.nn.common_types import _size_2_t
 from biotorch.autograd.fa.conv import Conv2dGrad
 
 
-class Conv2d(layers_fa.Conv2d):
+class Conv2d(fa_constructor.Conv2d):
     """
     Implements the method from How Important Is Weight Symmetry in Backpropagation?
 
@@ -27,8 +27,12 @@ class Conv2d(layers_fa.Conv2d):
             dilation: _size_2_t = 1,
             groups: int = 1,
             bias: bool = True,
-            padding_mode: str = 'zeros'
+            padding_mode: str = 'zeros',
+            layer_config: dict = None
     ):
+        if layer_config is None:
+            layer_config = {}
+        layer_config["type"] = "brsf"
 
         super(Conv2d, self).__init__(
             in_channels,
@@ -39,20 +43,6 @@ class Conv2d(layers_fa.Conv2d):
             dilation,
             groups,
             bias,
-            padding_mode
+            padding_mode,
+            layer_config
         )
-
-    def forward(self, x):
-        wb = torch.Tensor(self.weight.size()).to(self.weight.device)
-        torch.nn.init.xavier_uniform_(wb)
-        self.weight_backward = torch.nn.Parameter(wb * torch.sign(self.weight), requires_grad=False)
-
-        return Conv2dGrad.apply(x,
-                                self.weight,
-                                self.weight_backward,
-                                self.bias,
-                                None,
-                                self.stride,
-                                self.padding,
-                                self.dilation,
-                                self.groups)

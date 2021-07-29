@@ -1,0 +1,110 @@
+# Experiment Information
+experiment:
+  name: "experiment_CIFAR10_Benchmark_backpropagaation_resnet56"
+  output_dir: "trained_models"
+  # For reproducibility
+  seed: 2021
+  deterministic: false
+
+# Dataset
+data:
+  dataset: "cifar10_benchmark"
+  dataset_path: null
+  target_size: 32
+
+# Model
+model:
+  architecture: "resnet56"
+  mode:
+    type: "backpropagation"
+    options:
+      constraint# Experiment Information
+      experiment:
+        name: "experiment_CIFAR10_Benchmark_backpropagaation_resnet56"
+        output_dir: "trained_models"
+        # For reproducibility
+        seed: 2021
+        deterministic: false
+
+      # Dataset
+      data:
+        dataset: "cifar10_benchmark"
+        dataset_path: null
+        target_size: 32
+
+      # Model
+      model:
+        architecture: "resnet56"
+        mode:
+          type: "backpropagation"
+          options:
+            constrain_weights: false
+            scaling_factor: false
+            gradient_clip:
+
+        pretrained: false
+        # checkpoint:
+        loss_function:
+          name: "cross_entropy"
+
+      # Training Parameters
+      training:
+        hyperparameters:
+          epochs: 1
+          batch_size: 128
+
+        optimizer:
+          type: "SGD"
+          lr: 0.1
+          weight_decay: 0.0001
+          momentum: 0.9
+
+        lr_scheduler:
+          type: "multistep_lr"
+          gamma: 0.1
+          milestones: [ 100, 200, 250 ]
+
+        metrics:
+          top_k: 5
+          display_iterations: 500
+
+      # Infrastructure
+      infrastructure:
+        gpus: 3
+
+      evaluation: true
+      _weights: false
+      scaling_factor: false
+      gradient_clip:
+
+  pretrained: false
+  # checkpoint:
+  loss_function:
+    name: "cross_entropy"
+
+# Training Parameters
+training:
+  hyperparameters:
+    epochs: 1
+    batch_size: 128
+
+  optimizer:
+    type: "SGD"
+    lr: 0.1
+    weight_decay: 0.0001
+    momentum: 0.9
+
+  lr_scheduler:
+    type: "multistep_lr"
+    gamma: 0.1
+    milestones: [100, 200, 250]
+
+  metrics:
+    top_k: 5
+    display_iterations: 500
+
+# Infrastructure
+infrastructure:
+  gpus: 3
+
+evaluation: true

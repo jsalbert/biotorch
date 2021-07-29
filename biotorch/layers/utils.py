@@ -1,13 +1,10 @@
 import torch.nn as nn
 
-import biotorch.layers.fa as fa_layers
+import biotorch.layers.fa_constructor as fa_constructor
 import biotorch.layers.dfa as dfa_layers
-import biotorch.layers.sign_1 as sign_1_layers
-import biotorch.layers.sign_2 as sign_2_layers
-import biotorch.layers.sign_3 as sign_3_layers
 
 
-def convert_layer(layer, mode, copy_weights, output_dim=None):
+def convert_layer(layer, mode, copy_weights, layer_config=None, output_dim=None):
     # Initialize variables
     layer_bias, bias_weight = False, None
     # Save original weights and biases
@@ -19,9 +16,13 @@ def convert_layer(layer, mode, copy_weights, output_dim=None):
         layer_bias = True
 
     new_layer = None
+    if layer_config is None:
+        layer_config = {}
+
+    layer_config["type"] = mode
     if isinstance(layer, nn.Conv2d):
-        if mode == 'fa':
-            new_layer = fa_layers.Conv2d(
+        if mode in ["fa", "usf", "brsf", "frsf"]:
+            new_layer = fa_constructor.Conv2d(
                 layer.in_channels,
                 layer.out_channels,
                 layer.kernel_size,
@@ -30,7 +31,8 @@ def convert_layer(layer, mode, copy_weights, output_dim=None):
                 layer.dilation,
                 layer.groups,
                 layer_bias,
-                layer.padding_mode
+                layer.padding_mode,
+                layer_config
             )
         elif mode == 'dfa':
             new_layer = dfa_layers.Conv2d(
@@ -43,51 +45,17 @@ def convert_layer(layer, mode, copy_weights, output_dim=None):
                 layer.dilation,
                 layer.groups,
                 layer_bias,
-                layer.padding_mode
-            )
-        elif mode == 'sign_1':
-            new_layer = sign_1_layers.Conv2d(
-                layer.in_channels,
-                layer.out_channels,
-                layer.kernel_size,
-                layer.stride,
-                layer.padding,
-                layer.dilation,
-                layer.groups,
-                layer_bias,
-                layer.padding_mode
-            )
-        elif mode == 'sign_2':
-            new_layer = sign_2_layers.Conv2d(
-                layer.in_channels,
-                layer.out_channels,
-                layer.kernel_size,
-                layer.stride,
-                layer.padding,
-                layer.dilation,
-                layer.groups,
-                layer_bias,
-                layer.padding_mode
-            )
-        elif mode == 'sign_3':
-            new_layer = sign_3_layers.Conv2d(
-                layer.in_channels,
-                layer.out_channels,
-                layer.kernel_size,
-                layer.stride,
-                layer.padding,
-                layer.dilation,
-                layer.groups,
-                layer_bias,
-                layer.padding_mode
+                layer.padding_mode,
+                layer_config
             )
 
     elif isinstance(layer, nn.Linear):
-        if mode == 'fa':
-            new_layer = fa_layers.Linear(
+        if mode in ["fa", "usf", "brsf", "frsf"]:
+            new_layer = fa_constructor.Linear(
                 layer.in_features,
                 layer.out_features,
                 layer_bias,
+                layer_config
             )
         elif mode == 'dfa':
             new_layer = dfa_layers.Linear(
@@ -95,24 +63,7 @@ def convert_layer(layer, mode, copy_weights, output_dim=None):
                 layer.out_features,
                 output_dim,
                 layer_bias,
-            )
-        elif mode == 'sign_1':
-            new_layer = sign_1_layers.Linear(
-                layer.in_features,
-                layer.out_features,
-                layer_bias,
-            )
-        elif mode == 'sign_2':
-            new_layer = sign_2_layers.Linear(
-                layer.in_features,
-                layer.out_features,
-                layer_bias,
-            )
-        elif mode == 'sign_3':
-            new_layer = sign_3_layers.Linear(
-                layer.in_features,
-                layer.out_features,
-                layer_bias,
+                layer_config
             )
 
     if new_layer is not None and copy_weights:

@@ -19,7 +19,8 @@ class Conv2d(nn.Conv2d):
             dilation: _size_2_t = 1,
             groups: int = 1,
             bias: bool = True,
-            padding_mode: str = 'zeros'
+            padding_mode: str = 'zeros',
+            layer_config: dict = None
     ):
 
         super(Conv2d, self).__init__(
@@ -34,21 +35,47 @@ class Conv2d(nn.Conv2d):
             padding_mode
         )
 
+        self.layer_config = layer_config
+
+        if "options" not in self.layer_config:
+            self.layer_config["options"] = {
+                "constrain_weights": False,
+                "scaling_factor": False,
+                "gradient_clip": None
+            }
+
+        self.options = self.layer_config["options"]
+        self.loss_gradient = None
         self.weight_dfa = nn.Parameter(torch.Tensor(size=(output_dim, self.in_channels, self.kernel_size[0], self.kernel_size[1])),
                                        requires_grad=False)
         nn.init.xavier_uniform_(self.weight)
         nn.init.xavier_uniform_(self.weight_dfa)
+
         self.bias_dfa = None
-        self.loss_gradient = None
         if self.bias is not None:
             self.bias_dfa = nn.Parameter(torch.Tensor(size=(output_dim, self.in_channels)), requires_grad=False)
             nn.init.constant_(self.bias, 1)
             nn.init.constant_(self.bias_dfa, 1)
+
+        if self.options["constrain_weights"]:
+            self.norm_initial_weights = torch.linalg.norm(self.weight)
+
+        if self.options["scaling_factor"]:
+            fan_in, fan_out = torch.nn.init._calculate_fan_in_and_fan_out(self.weight)
+            self.scaling_factor = math.sqrt(2.0 / float(fan_in + fan_out))
+
         # Will use gradients computed in the backward hook
         self.register_backward_hook(self.dfa_backward_hook)
 
     def forward(self, x):
         # Regular BackPropagation Forward-Backward
+        with torch.no_grad():
+            if self.options["constrain_weights"]:
+                self.weight *= self.norm_initial_weights / torch.linalg.norm(self.weight)
+
+            if self.options["scaling_factor"]:
+                self.weight_dfa = torch.nn.Parameter(self.scaling_factor * self.weight_dfa, requires_grad=False)
+
         return Conv2dGrad.apply(x,
                                 self.weight,
                                 self.bias,
