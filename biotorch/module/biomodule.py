@@ -6,20 +6,22 @@ from biotorch.module.converter import ModuleConverter
 
 
 class BioModule(nn.Module):
-    def __init__(self, module, mode='fa', copy_weights=True, output_dim=None):
+    def __init__(self, module, mode='fa', copy_weights=True, layer_config=None, output_dim=None):
         super(BioModule, self).__init__()
         self.module = module
         self.mode = mode
         self.output_dim = output_dim
         self.copy_weights = copy_weights
-
+        if layer_config is None:
+            layer_config = {"type": mode}
+        self.layer_config = layer_config
         if self.mode == 'dfa':
             if self.output_dim is None:
                 raise ValueError('You need to introduce the `output_dim` of your model for '
                                  'Direct Feedback Alignment mode')
         if mode != 'BP':
             module_converter = ModuleConverter(mode=self.mode)
-            self.module = module_converter.convert(module, copy_weights, output_dim)
+            self.module = module_converter.convert(self.module, self.copy_weights, self.layer_config, self.output_dim)
 
     def forward(self, x, targets=None, loss_function=None):
         output = self.module(x)

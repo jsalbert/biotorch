@@ -34,6 +34,12 @@ class CIFAR100(Dataset):
                                               train=False,
                                               download=True,
                                               transform=transforms.Compose(self.test_transforms)
+                                             )
+
+        self.test_dataset = datasets.CIFAR100(self.dataset_path,
+                                              train=False,
+                                              download=True,
+                                              transform=transforms.Compose(self.test_transforms)
                                               )
 
 
@@ -97,6 +103,8 @@ class CIFAR10Benchmark(Dataset):
         print('Preparing {} and storing data in {}'.format(str(self), dataset_path))
 
         # Train is 45k and validation is 5k as in (https://arxiv.org/pdf/1512.03385.pdf)
+
+        # Seed is fixed
         random.seed(0)
         self.train_transforms = [
             transforms.RandomHorizontalFlip(),

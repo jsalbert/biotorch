@@ -33,4 +33,4 @@ class Evaluator:
             device=self.device,
         )
 
-        return acc, loss
+        return acc.cpu().numpy(), loss

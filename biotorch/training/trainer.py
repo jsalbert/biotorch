@@ -101,3 +101,6 @@ class Trainer:
             # Update scheduler after training epoch
             self.lr_scheduler.step()
             self.writer.add_scalar('time/train', total_time, epoch)
+
+        with open(os.path.join(self.output_dir, 'best_acc.txt'), 'w') as f:
+            f.write(str(self.best_acc))

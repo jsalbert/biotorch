@@ -16,11 +16,12 @@
           "type": "string"
         },
         "seed": {
-          "type": [
-            "null",
-            "integer"
-          ],
-          "default": null
+          "type": "integer",
+          "default": 1
+        },
+        "deterministic": {
+          "type": "boolean",
+          "default": false
         }
       },
       "additionalProperties": false,
@@ -50,11 +51,23 @@
       },
       "dataset_path": {
         "type": "string"
-      }
+      },
+      "target_size": {
+            "type": "integer"
+          },
+      "batch_size": {
+            "type": "integer",
+            "default": 32
+          },
+      "num_workers": {
+            "type": "integer",
+            "default": 0
+          }
       },
     "additionalProperties": false,
     "required": [
-      "dataset"
+      "dataset",
+      "target_size"
     ]
   },
   "training": {
@@ -69,160 +82,145 @@
           "batch_size": {
             "type": "integer",
             "default": 32
-          },
-          "target_size": {
-            "type": "integer"
           }
         },
         "additionalProperties": false,
-        "required": [
-          "num_epochs",
-          "target_size"
-        ]
+        "required": "num_epochs"
       },
-      "loss_function": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "default": "cross_entropy"
-          }
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ]
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "top_k": {
+          "type": "integer",
+          "default": 5
         },
-        "additionalProperties": false,
-        "required": [
-          "name"
-        ]
+        "display_iterations": {
+          "type": "integer",
+          "default": 500
+        }
       },
-      "metrics": {
-        "type": "object",
-        "properties": {
-          "top_k": {
-            "type": "integer",
-            "default": 5
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ]
+    },
+    "optimizer": {
+      "type": "object",
+      "properties": {
+        "SGD": {
+          "type": "object",
+          "properties": {
+            "lr": {
+              "type": "number",
+              "default": 0.001
+            },
+            "weight_decay": {
+              "type": "number",
+              "default": 0.0
+            },
+            "momentum": {
+              "type": "number",
+              "default": 0.9
+            },
+            "gamma": {
+              "type": "number",
+              "default": 0.5
+            },
+            "scheduler_frequency": {
+              "type": "array",
+              "default": []
+            }
           },
-          "display_iterations": {
-            "type": "integer",
-            "default": 500
-          }
+          "additionalProperties": false,
+          "required": [
+            "lr",
+            "weight_decay",
+            "momentum"
+          ],
+          "default": {}
         },
-        "additionalProperties": false,
-        "required": [
-          "name"
-        ]
+        "Adam": {
+          "type": "object",
+          "properties": {
+            "lr": {
+              "type": "number",
+              "default": 0.01
+            },
+            "beta_1": {
+              "type": "number",
+              "default": 0.0
+            },
+            "beta_2": {
+              "type": "number",
+              "default": 0.0
+            },
+            "epsilon": {
+              "type": "number",
+              "default": 0.0
+            },
+            "weight_decay": {
+              "type": "number",
+              "default": 0.0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "lr",
+            "beta_1",
+            "beta_2",
+            "epsilon",
+            "weight_decay"
+          ]
+        },
+        "RMSProp": {
+          "type": "object",
+          "properties": {
+            "lr": {
+              "type": "number",
+              "default": 0.01
+            },
+            "epsilon": {
+              "type": "number",
+              "default": 0.0
+            },
+            "weight_decay": {
+              "type": "number",
+              "default": 0.0
+            },
+            "momentum": {
+              "type": "number",
+              "default": 0.9
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "lr",
+            "momentum",
+            "epsilon",
+            "weight_decay"
+          ]
+        }
       },
-      "optimizer": {
-        "type": "object",
-        "properties": {
-          "SGD": {
-            "type": "object",
-            "properties": {
-              "lr": {
-                "type": "number",
-                "default": 0.001
-              },
-              "weight_decay": {
-                "type": "number",
-                "default": 0.0
-              },
-              "momentum": {
-                "type": "number",
-                "default": 0.9
-              },
-              "gamma": {
-                "type": "number",
-                "default": 0.5
-              },
-              "scheduler_frequency": {
-                "type": "array",
-                "default": []
-              }
-            },
-            "additionalProperties": false,
-            "required": [
-              "lr",
-              "weight_decay",
-              "momentum"
-            ],
-            "default": {}
-          },
-          "Adam": {
-            "type": "object",
-            "properties": {
-              "lr": {
-                "type": "number",
-                "default": 0.01
-              },
-              "beta_1": {
-                "type": "number",
-                "default": 0.0
-              },
-              "beta_2": {
-                "type": "number",
-                "default": 0.0
-              },
-              "epsilon": {
-                "type": "number",
-                "default": 0.0
-              },
-              "weight_decay": {
-                "type": "number",
-                "default": 0.0
-              }
-            },
-            "additionalProperties": false,
-            "required": [
-              "lr",
-              "beta_1",
-              "beta_2",
-              "epsilon",
-              "weight_decay"
-            ]
-          },
-          "RMSProp": {
-            "type": "object",
-            "properties": {
-              "lr": {
-                "type": "number",
-                "default": 0.01
-              },
-              "epsilon": {
-                "type": "number",
-                "default": 0.0
-              },
-              "weight_decay": {
-                "type": "number",
-                "default": 0.0
-              },
-              "momentum": {
-                "type": "number",
-                "default": 0.9
-              }
-            },
-            "additionalProperties": false,
-            "required": [
-              "lr",
-              "momentum",
-              "epsilon",
-              "weight_decay"
-            ]
-          }
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "SGD"
+          ]
         },
-        "additionalProperties": false,
-        "oneOf": [
-          {
-            "type": "object",
-            "required": [
-              "SGD"
-            ]
-          },
-          {
-            "type": "object",
-            "required": [
-              "Adam"
-            ]
-          }
-        ]
-      }
+        {
+          "type": "object",
+          "required": [
+            "Adam"
+          ]
+        }
+      ]
     },
     "additionalProperties": false,
     "required": [
@@ -233,19 +231,50 @@
     "type": "object",
     "properties": {
       "mode": {
-        "type": "string",
-        "enum": [
-          "backpropagation",
-          "fa",
-          "dfa",
-          "sign_1",
-          "sign_2",
-          "sign_3"
-        ]
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+                "backpropagation",
+                "fa",
+                "dfa",
+                "usf",
+                "brsf",
+                "frsf"
+              ]
+          },
+          "options": {
+            "type": "object",
+            "properties": {
+              "constrain_weights": {
+                "type": "boolean",
+                "default": false
+              },
+              "scaling_factor": {
+                "type": "boolean",
+                "default": false
+              },
+              "gradient_clip": {
+                "type": "boolean",
+                "default": false
+              }
+            }
+          }
+        }
       },
       "pretrained": {
         "type": "boolean",
         "default": false
+      },
+      "loss_function": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "cross_entropy"
+          }
+        }
       },
       "architecture": {
         "type": "string",
@@ -260,6 +289,7 @@
           "resnet18",
           "resnet34",
           "resnet50",
+          "resnet20",
           "squeezenet1_0",
           "squeezenet1_1",
           "vgg11",
@@ -294,7 +324,6 @@
     "required": [
       "experiment",
       "infrastructure",
-      "training",
       "model",
       "data"
     ]
