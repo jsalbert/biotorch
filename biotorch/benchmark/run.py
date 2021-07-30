@@ -31,6 +31,14 @@ class Benchmark:
         torch.manual_seed(self.config_file['experiment']['seed'])
         random.seed(self.config_file['experiment']['seed'])
         np.random.seed(self.config_file['experiment']['seed'])
+
+        # Reproducibility
+        if self.config_file['experiment']['deterministic']:
+            cudnn.benchmark = False
+            torch.use_deterministic_algorithms(True)
+        else:
+            cudnn.benchmark = True
+
         # Parse config file
         self.gpus = self.config_file['infrastructure']['gpus']
         self.model_config = self.config_file['model']
@@ -77,12 +85,6 @@ class Benchmark:
             elif isinstance(self.gpus, list):
                 self.device += ':' + str(self.gpus[0])
                 self.multi_gpu = True
-
-        if self.config_file['experiment']['deterministic']:
-            cudnn.benchmark = False
-            torch.use_deterministic_algorithms(True)
-        else:
-            cudnn.benchmark = True
 
         self.output_dir = os.path.join(self.config_file['experiment']['output_dir'],
                                        self.config_file['experiment']['name'])

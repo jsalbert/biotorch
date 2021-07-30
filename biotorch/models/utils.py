@@ -17,3 +17,15 @@ def create_resnet_biomodel(model_architecture,
             model.fc = nn.Linear(model.fc.in_features, num_classes)
 
     return BioModule(model, mode=mode, layer_config=layer_config, output_dim=num_classes)
+
+
+def create_le_net_biomodel(model_architecture,
+                               mode,
+                               layer_config:dict = None,
+                               pretrained: bool = False,
+                               progress: bool = True,
+                               num_classes: int = 10) -> BioModule:
+
+    model = model_architecture(pretrained, progress, num_classes=num_classes)
+
+    return BioModule(model, mode=mode, layer_config=layer_config, output_dim=num_classes)

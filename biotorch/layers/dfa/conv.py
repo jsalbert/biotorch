@@ -1,3 +1,4 @@
+import math
 import torch
 import torch.nn as nn
 
@@ -71,7 +72,7 @@ class Conv2d(nn.Conv2d):
         # Regular BackPropagation Forward-Backward
         with torch.no_grad():
             if self.options["constrain_weights"]:
-                self.weight *= self.norm_initial_weights / torch.linalg.norm(self.weight)
+                self.weight = torch.nn.Parameter(self.weight * self.norm_initial_weights / torch.linalg.norm(self.weight))
 
             if self.options["scaling_factor"]:
                 self.weight_dfa = torch.nn.Parameter(self.scaling_factor * self.weight_dfa, requires_grad=False)

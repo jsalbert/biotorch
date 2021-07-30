@@ -26,6 +26,13 @@ class MNIST(Dataset):
             transform=transforms.Compose(self.train_transforms)
         )
 
+        self.val_dataset = datasets.MNIST(
+            self.dataset_path,
+            train=False,
+            download=True,
+            transform=transforms.Compose(self.test_transforms)
+        )
+
         self.test_dataset = datasets.MNIST(
             self.dataset_path,
             train=False,

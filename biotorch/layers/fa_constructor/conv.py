@@ -53,7 +53,7 @@ class Conv2d(nn.Conv2d):
         nn.init.xavier_uniform_(self.weight)
         self.bias_backward = None
 
-        if self.layer_config["type"] in ["fa", "frSF"]:
+        if self.layer_config["type"] in ["fa", "frsf"]:
             self.weight_backward = nn.Parameter(torch.Tensor(self.weight.size()), requires_grad=False)
             nn.init.xavier_uniform_(self.weight_backward)
             if self.bias is not None:
@@ -79,17 +79,17 @@ class Conv2d(nn.Conv2d):
             # Based on "Feedback alignment in deep convolutional networks" (https://arxiv.org/pdf/1812.06488.pdf)
             # Constrain weight magnitude
             if self.options["constrain_weights"]:
-                self.weight *= self.norm_initial_weights / torch.linalg.norm(self.weight)
+                self.weight = torch.nn.Parameter(self.weight * self.norm_initial_weights / torch.linalg.norm(self.weight))
 
             # Backward using weight_backward matrix
             if self.layer_config["type"] == "usf":
-                self.weight_backward = torch.nn.Parameter(torch.sign(self.weight))
+                self.weight_backward = torch.nn.Parameter(torch.sign(self.weight), requires_grad=False)
             elif self.layer_config["type"] == "brsf":
                 wb = torch.Tensor(self.weight.size()).to(self.weight.device)
                 torch.nn.init.xavier_uniform_(wb)
                 self.weight_backward = torch.nn.Parameter(wb * torch.sign(self.weight), requires_grad=False)
             elif self.layer_config["type"] == "frsf":
-                self.weight_backward = self.weight_backward * torch.sign(self.weight)
+                self.weight_backward = torch.nn.Parameter(self.weight_backward * torch.sign(self.weight), requires_grad=False)
 
             # To avoid Exploding Gradients, we scale the weights by a scaling factor
             # given by our layer initialization as in "Biologically-Plausible Learning Algorithms Can

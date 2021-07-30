@@ -41,6 +41,7 @@ class Dataset(object):
         random.seed(worker_seed)
 
     def _create_dataloader(self, mode, batch_size, shuffle=True, drop_last=True, num_workers=0):
+        # For reproducibility
         g = torch.Generator()
         g.manual_seed(0)
         if mode == 'train':
@@ -49,8 +50,8 @@ class Dataset(object):
                               shuffle=shuffle,
                               drop_last=drop_last,
                               num_workers=num_workers,
-                              worker_init_fn=self.seed_worker,
-                              generator=g
+                              # worker_init_fn=self.seed_worker,
+                              # generator=g
                               )
         elif mode == 'val':
             return DataLoader(self.val_dataset, batch_size=batch_size, shuffle=False, drop_last=False)
