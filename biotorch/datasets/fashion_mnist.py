@@ -32,3 +32,10 @@ class FashionMNIST(Dataset):
             download=True,
             transform=transforms.Compose(self.test_transforms)
         )
+
+        self.test_dataset = datasets.FashionMNIST(
+            self.dataset_path,
+            train=False,
+            download=True,
+            transform=transforms.Compose(self.test_transforms)
+        )

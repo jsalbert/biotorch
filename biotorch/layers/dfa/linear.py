@@ -16,7 +16,7 @@ class Linear(nn.Linear):
             self.layer_config["options"] = {
                 "constrain_weights": False,
                 "scaling_factor": False,
-                "gradient_clip": None
+                "gradient_clip": False
             }
 
         self.options = self.layer_config["options"]
@@ -36,8 +36,7 @@ class Linear(nn.Linear):
                 self.norm_initial_weights = torch.linalg.norm(self.weight)
 
         if self.options["scaling_factor"]:
-            fan_in, fan_out = torch.nn.init._calculate_fan_in_and_fan_out(self.weight)
-            self.scaling_factor = math.sqrt(2.0 / float(fan_in + fan_out))
+            raise ValueError('scaling_factor not supported for DFA')
 
         # Will use gradients computed in the backward hook
         self.register_backward_hook(self.dfa_backward_hook)
@@ -47,9 +46,6 @@ class Linear(nn.Linear):
         with torch.no_grad():
             if self.options["constrain_weights"]:
                 self.weight = torch.nn.Parameter(self.weight * self.norm_initial_weights / torch.linalg.norm(self.weight))
-
-            if self.options["scaling_factor"]:
-                self.weight_dfa = torch.nn.Parameter(self.scaling_factor * self.weight_dfa, requires_grad=False)
 
         return LinearGrad.apply(x, self.weight, self.bias)
 

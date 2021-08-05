@@ -19,18 +19,20 @@ class Linear(nn.Linear):
         if "options" not in self.layer_config:
             self.layer_config["options"] = {
                 "constrain_weights": False,
-                "scaling_factor": False,
-                "gradient_clip": None
+                "gradient_clip": False
             }
 
         self.options = self.layer_config["options"]
+        self.type = self.layer_config["type"]
 
         nn.init.xavier_uniform_(self.weight)
         self.bias_backward = None
 
-        if self.layer_config["type"] in ["fa", "frsf"]:
+        if self.type in ["fa", "frsf"]:
             self.weight_backward = nn.Parameter(torch.Tensor(self.weight.size()), requires_grad=False)
             nn.init.xavier_uniform_(self.weight_backward)
+            if self.type == "frsf":
+                self.weight_backward = nn.Parameter(torch.abs(self.weight_backward), requires_grad=False)
             if self.bias is not None:
                 self.bias_backward = nn.Parameter(torch.Tensor(self.bias.size()), requires_grad=False)
                 nn.init.constant_(self.bias_backward, 1)
@@ -39,18 +41,20 @@ class Linear(nn.Linear):
             nn.init.constant_(self.bias, 1)
 
         if self.options["constrain_weights"]:
-            with torch.no_grad():
-                self.norm_initial_weights = torch.linalg.norm(self.weight)
+            self.norm_initial_weights = torch.linalg.norm(self.weight)
 
-        if self.options["scaling_factor"]:
+        if self.type == "usf":
+            # Standard deviation of xavier init.
             fan_in, fan_out = torch.nn.init._calculate_fan_in_and_fan_out(self.weight)
             self.scaling_factor = math.sqrt(2.0 / float(fan_in + fan_out))
 
         self.alignment = 0
 
-        # self.register_backward_hook(self.gradient_clip)
+        if self.options["gradient_clip"]:
+            self.register_backward_hook(self.gradient_clip)
 
     def forward(self, x):
+        weight_backward = None
         with torch.no_grad():
             # Based on "Feedback alignment in deep convolutional networks" (https://arxiv.org/pdf/1812.06488.pdf)
             # Constrain weight magnitude
@@ -58,22 +62,26 @@ class Linear(nn.Linear):
                 self.weight = torch.nn.Parameter(self.weight * self.norm_initial_weights / torch.linalg.norm(self.weight))
 
             # Backward using weight_backward matrix
-            if self.layer_config["type"] == "usf":
-                self.weight_backward = torch.nn.Parameter(torch.sign(self.weight), requires_grad=False)
-            elif self.layer_config["type"] == "brsf":
+            if self.type == "usf":
+                weight_backward = torch.nn.Parameter(torch.sign(self.weight), requires_grad=False)
+                # To avoid Exploding Gradients, we scale the sign of the weights by a scaling factor
+                # given by our layer initialization as in "Biologically-Plausible Learning Algorithms Can
+                # Scale to Large Datasets" (https://arxiv.org/pdf/1811.03567.pdf)
+                weight_backward = torch.nn.Parameter(self.scaling_factor * weight_backward, requires_grad=False)
+                self.weight_backward = weight_backward
+            elif self.type == "brsf":
                 wb = torch.Tensor(self.weight.size()).to(self.weight.device)
                 torch.nn.init.xavier_uniform_(wb)
-                self.weight_backward = torch.nn.Parameter(wb * torch.sign(self.weight), requires_grad=False)
-            elif self.layer_config["type"] == "frsf":
-                self.weight_backward = torch.nn.Parameter(self.weight_backward * torch.sign(self.weight), requires_grad=False)
+                weight_backward = torch.nn.Parameter(torch.abs(wb) * torch.sign(self.weight), requires_grad=False)
+                self.weight_backward = weight_backward
+            elif self.type == "frsf":
+                weight_backward = torch.nn.Parameter(torch.abs(self.weight_backward) * torch.sign(self.weight),
+                                                     requires_grad=False)
+            # Vanilla FA
+            if weight_backward is None:
+                weight_backward = self.weight_backward
 
-            # To avoid Exploding Gradients, we scale the sign of the weights by a scaling factor
-            # given by our layer initialization as in "Biologically-Plausible Learning Algorithms Can
-            # Scale to Large Datasets" (https://arxiv.org/pdf/1811.03567.pdf)
-            if self.options["scaling_factor"]:
-                self.weight_backward = torch.nn.Parameter(self.scaling_factor * self.weight_backward, requires_grad=False)
-
-        return LinearGrad.apply(x, self.weight, self.weight_backward, self.bias, self.bias_backward)
+        return LinearGrad.apply(x, self.weight, weight_backward, self.bias, self.bias_backward)
 
     def compute_alignment(self):
         self.alignment = compute_matrix_angle(self.weight_backward, self.weight)

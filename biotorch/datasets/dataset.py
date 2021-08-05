@@ -40,29 +40,48 @@ class Dataset(object):
         numpy.random.seed(worker_seed)
         random.seed(worker_seed)
 
-    def _create_dataloader(self, mode, batch_size, shuffle=True, drop_last=True, num_workers=0):
-        # For reproducibility
-        g = torch.Generator()
-        g.manual_seed(0)
+    def _create_dataloader(self, mode, batch_size, deterministic=False, shuffle=True, drop_last=True, num_workers=0):
+        # For reproducibility (deterministic dataloader sampling)
+        gen = None
+        worker_init_fn = None
+        if deterministic and num_workers > 0:
+            worker_init_fn = self.seed_worker
+            gen = torch.Generator()
+            gen.manual_seed(0)
+
         if mode == 'train':
             return DataLoader(self.train_dataset,
                               batch_size=batch_size,
                               shuffle=shuffle,
                               drop_last=drop_last,
                               num_workers=num_workers,
-                              # worker_init_fn=self.seed_worker,
-                              # generator=g
+                              worker_init_fn=worker_init_fn,
+                              generator=gen
                               )
         elif mode == 'val':
-            return DataLoader(self.val_dataset, batch_size=batch_size, shuffle=False, drop_last=False)
+            return DataLoader(self.val_dataset,
+                              batch_size=batch_size,
+                              shuffle=False,
+                              drop_last=False,
+                              num_workers=num_workers,
+                              worker_init_fn=worker_init_fn,
+                              generator=gen
+                              )
         elif mode == 'test':
-            return DataLoader(self.test_dataset, batch_size=batch_size, shuffle=False, drop_last=False)
+            return DataLoader(self.test_dataset,
+                              batch_size=batch_size,
+                              shuffle=False,
+                              drop_last=False,
+                              num_workers=num_workers,
+                              worker_init_fn=worker_init_fn,
+                              generator=gen
+                              )
 
-    def create_train_dataloader(self, batch_size, num_workers=0):
-        return self._create_dataloader('train', batch_size, num_workers)
+    def create_train_dataloader(self, batch_size, deterministic=False, num_workers=0):
+        return self._create_dataloader('train', batch_size, deterministic=deterministic, num_workers=num_workers)
 
-    def create_val_dataloader(self, batch_size, num_workers=0):
-        return self._create_dataloader('val', batch_size, num_workers)
+    def create_val_dataloader(self, batch_size, deterministic=False, num_workers=0):
+        return self._create_dataloader('val', batch_size, deterministic=deterministic, num_workers=num_workers)
 
-    def create_test_dataloader(self, batch_size, num_workers=0):
-        return self._create_dataloader('test', batch_size)
+    def create_test_dataloader(self, batch_size, deterministic=False, num_workers=0):
+        return self._create_dataloader('test', batch_size, deterministic=deterministic, num_workers=num_workers)

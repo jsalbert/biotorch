@@ -33,7 +33,8 @@ class Benchmark:
         np.random.seed(self.config_file['experiment']['seed'])
 
         # Reproducibility
-        if self.config_file['experiment']['deterministic']:
+        self.deterministic = self.config_file['experiment']['deterministic']
+        if self.deterministic:
             cudnn.benchmark = False
             torch.use_deterministic_algorithms(True)
         else:
@@ -97,15 +98,19 @@ class Benchmark:
         self.target_size = self.data_config['target_size']
         self.display_iterations = self.metrics['display_iterations']
 
-
         # Create dataset
         self.dataset_creator = DatasetSelector(self.data_config['dataset']).get_dataset()
         if self.data_config['dataset_path'] is not None:
-            self.dataset = self.dataset_creator(self.target_size,  dataset_path=self.data_config['dataset_path'])
+            self.dataset = self.dataset_creator(self.target_size, dataset_path=self.data_config['dataset_path'])
         else:
             self.dataset = self.dataset_creator(self.target_size)
-        self.train_dataloader = self.dataset.create_train_dataloader(self.batch_size, num_workers=self.num_workers)
-        self.val_dataloader = self.dataset.create_val_dataloader(self.batch_size)
+
+        self.train_dataloader = self.dataset.create_train_dataloader(self.batch_size,
+                                                                     deterministic=self.deterministic,
+                                                                     num_workers=self.num_workers)
+        self.val_dataloader = self.dataset.create_val_dataloader(self.batch_size,
+                                                                 deterministic=self.deterministic,
+                                                                 num_workers=self.num_workers)
         self.num_classes = self.dataset.num_classes
 
         # Create model
@@ -156,9 +161,11 @@ class Benchmark:
         trainer.run()
 
         if self.config_file['evaluation']:
-
             self.model = torch.load(os.path.join(self.output_dir, 'model_best_acc.pth'))
-            self.test_dataloader = self.dataset.create_test_dataloader(self.batch_size)
+            self.test_dataloader = self.dataset.create_test_dataloader(self.batch_size,
+                                                                       deterministic=self.deterministic,
+                                                                       num_workers=self.num_workers
+                                                                       )
 
             self.evaluator = Evaluator(
                 self.model,
@@ -186,7 +193,10 @@ class Benchmark:
         else:
             self.dataset = self.dataset_creator(self.target_size)
 
-        self.test_dataloader = self.dataset.create_test_dataloader(self.batch_size)
+        self.test_dataloader = self.dataset.create_test_dataloader(self.batch_size,
+                                                                   deterministic=self.deterministic,
+                                                                   num_workers=self.num_workers)
+
         self.loss_function = select_loss_function(self.loss_function_config)
 
         self.evaluator = Evaluator(
