@@ -37,7 +37,7 @@ class Trainer:
         self.multi_gpu = multi_gpu
         self.display_iterations = display_iterations
         self.writer = SummaryWriter(self.logs_dir)
-        self.layer_alignment_modes = ['weight_mirroring', 'fa', 'sign_1', 'sign_2', 'sign_3']
+        self.layer_alignment_modes = ['weight_mirroring', 'fa', 'usf', 'frsf', 'brsf']
 
     def run(self):
         self.best_acc = 0.0
