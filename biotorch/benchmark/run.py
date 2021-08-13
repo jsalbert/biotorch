@@ -49,7 +49,7 @@ class Benchmark:
         else:
             self.benchmark_mode = 'training'
             self.hyperparameters = self.config_file['training']['hyperparameters']
-            self.metrics = self.config_file['training']['metrics']
+            self.metrics_config = self.config_file['training']['metrics']
             self.optimizer_config = self.config_file['training']['optimizer']
             self.lr_scheduler_config = self.config_file['training']['lr_scheduler']
             self.mode_names = sorted(name for name in models.__dict__ if name.islower() and not name.startswith("__")
@@ -96,7 +96,6 @@ class Benchmark:
         self.epochs = self.hyperparameters['epochs']
         self.batch_size = self.hyperparameters['batch_size']
         self.target_size = self.data_config['target_size']
-        self.display_iterations = self.metrics['display_iterations']
 
         # Create dataset
         self.dataset_creator = DatasetSelector(self.data_config['dataset']).get_dataset()
@@ -156,8 +155,9 @@ class Benchmark:
                           device=self.device,
                           epochs=self.epochs,
                           output_dir=self.output_dir,
-                          multi_gpu=self.multi_gpu,
-                          display_iterations=self.display_iterations)
+                          metrics_config=self.metrics_config,
+                          multi_gpu=self.multi_gpu
+                          )
         trainer.run()
 
         if self.config_file['evaluation']:

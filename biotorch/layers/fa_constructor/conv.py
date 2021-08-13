@@ -79,7 +79,7 @@ class Conv2d(nn.Conv2d):
                 self.weight_backward = torch.nn.Parameter(self.scaling_factor * torch.sign(self.weight), requires_grad=False)
 
         self.alignment = 0
-        self.weight_diff = 0
+        self.weight_ratio = 0
 
         if "gradient_clip" in self.options and self.options["gradient_clip"]:
             self.register_backward_hook(self.gradient_clip)
@@ -128,7 +128,7 @@ class Conv2d(nn.Conv2d):
         self.alignment = compute_matrix_angle(self.weight_backward, self.weight)
         return self.alignment
 
-    def compute_weight_difference(self):
+    def compute_weight_ratio(self):
         with torch.no_grad():
             self.weight_diff = torch.linalg.norm(self.weight_backward) / torch.linalg.norm(self.weight)
         return self.weight_diff

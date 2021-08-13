@@ -30,7 +30,7 @@ def compute_angles_module(module):
     return layers_alignment
 
 
-def compute_weight_difference_module(module, mode):
+def compute_weight_ratio_module(module, mode):
     queue = deque()
     weight_diff = OrderedDict()
     seen_keys = defaultdict(lambda: 0)
@@ -48,8 +48,8 @@ def compute_weight_difference_module(module, mode):
             with torch.no_grad():
                 weight = torch.linalg.norm(layer.weight)
 
-        elif 'weight_diff' in layer.__dict__:
-            weight = layer.compute_weight_difference()
+        elif 'weight_ratio' in layer.__dict__:
+            weight = layer.compute_weight_ratio()
 
         if weight is not None:
             key_name = module_key + '_' + str(seen_keys[module_key])

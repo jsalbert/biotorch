@@ -78,12 +78,13 @@ def test(model,
          loss_function,
          test_dataloader,
          device,
+         top_k=5,
          ):
 
     batch_time = AverageMeter('Time', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
     top1 = AverageMeter('Acc@1', ':6.2f')
-    top5 = AverageMeter('Acc@5', ':6.2f')
+    topk = AverageMeter('Acc@'+str(top_k), ':6.2f')
 
     # Switch to evaluate mode
     model.eval()
@@ -100,12 +101,12 @@ def test(model,
             # Compute loss function
             loss = loss_function(outputs, targets)
             # Measure accuracy and record loss
-            acc1, acc5 = accuracy(outputs, targets, topk=(1, 5))
+            acc1, acc5 = accuracy(outputs, targets, topk=(1, top_k))
             losses.update(loss.item(), inputs.size(0))
             top1.update(acc1[0], inputs.size(0))
-            top5.update(acc5[0], inputs.size(0))
+            topk.update(acc5[0], inputs.size(0))
 
-        print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'.format(top1=top1, top5=top5))
+        print(' * Acc@1 {top1.avg:.3f} Acc@{top_k} {topk.avg:.3f}'.format(top1=top1, top_k=top_k, topk=topk))
     return top1.avg, losses.avg
 
 
