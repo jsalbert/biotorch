@@ -5,7 +5,7 @@ import torch
 
 from torch.utils.tensorboard import SummaryWriter
 from biotorch.training.functions import train, test
-from biotorch.training.metrics import compute_angles_module
+from biotorch.training.metrics import compute_angles_module, compute_weight_difference_module
 
 
 class Trainer:
@@ -58,6 +58,23 @@ class Trainer:
             print('Warm-up completed')
 
         for epoch in range(self.epochs):
+            if self.mode in self.layer_alignment_modes:
+                # Fails for multi-gpu and usf, brsf as weight backwards is being written in replicas
+                try:
+                    layers_alignment = compute_angles_module(self.model)
+                    self.writer.add_scalars('layer_alignment/train', layers_alignment, epoch)
+                except:
+                    pass
+
+            active = True
+
+            if active:
+                try:
+                    weight_difference = compute_weight_difference_module(self.model, self.mode)
+                    self.writer.add_scalars('weight_difference/train', weight_difference, epoch)
+                except:
+                    pass
+
             t = time.time()
             acc, loss = train(
                 model=self.model,
@@ -70,6 +87,7 @@ class Trainer:
                 epoch=epoch,
                 display_iterations=self.display_iterations
             )
+
             self.writer.add_scalar('accuracy/train', acc, epoch)
             self.writer.add_scalar('loss/train', loss, epoch)
 
@@ -92,10 +110,6 @@ class Trainer:
                     torch.save(self.model, os.path.join(self.output_dir, 'model_best_acc.pth'))
             torch.save(self.model, os.path.join(self.output_dir, 'latest_model.pth'))
 
-            if self.mode in self.layer_alignment_modes:
-                layers_alignment = compute_angles_module(self.model)
-                self.writer.add_scalars('layer_alignment/train', layers_alignment, epoch)
-
             total_time = time.time() - t
 
             # Update scheduler after training epoch
@@ -104,3 +118,20 @@ class Trainer:
 
         with open(os.path.join(self.output_dir, 'best_acc.txt'), 'w') as f:
             f.write(str(self.best_acc))
+
+        if self.mode in self.layer_alignment_modes:
+            # Fails for multi-gpu and usf, brsf as weight backwards is being written in replicas
+            try:
+                layers_alignment = compute_angles_module(self.model)
+                self.writer.add_scalars('layer_alignment/train', layers_alignment, epoch)
+            except:
+                pass
+
+        active = True
+
+        if active:
+            try:
+                weight_difference = compute_weight_difference_module(self.model, self.mode)
+                self.writer.add_scalars('weight_difference/train', weight_difference, epoch)
+            except:
+                pass

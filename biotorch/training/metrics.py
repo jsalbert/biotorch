@@ -30,6 +30,40 @@ def compute_angles_module(module):
     return layers_alignment
 
 
+def compute_weight_difference_module(module, mode):
+    queue = deque()
+    weight_diff = OrderedDict()
+    seen_keys = defaultdict(lambda: 0)
+
+    # First pass to store module keys
+    for module_keys in module._modules.keys():
+        queue.append((module, module_keys))
+
+    # Approximate depth first traversal of the model using a deque
+    while len(queue) > 0:
+        module, module_key = queue.popleft()
+        layer = getattr(module, module_key)
+        weight = None
+        if mode == 'backpropagation' and isinstance(layer, (torch.nn.Conv2d, torch.nn.Linear)):
+            with torch.no_grad():
+                weight = torch.linalg.norm(layer.weight)
+
+        elif 'weight_diff' in layer.__dict__:
+            weight = layer.compute_weight_difference()
+
+        if weight is not None:
+            key_name = module_key + '_' + str(seen_keys[module_key])
+            seen_keys[module_key] += 1
+            weight_diff[key_name] = weight.item()
+
+        if len(layer._modules.keys()) > 0:
+            # Reverse list as we are appending from the left side of the queue
+            for key in list(layer._modules.keys())[::-1]:
+                queue.appendleft((layer, key))
+
+    return weight_diff
+
+
 class AverageMeter(object):
     """Computes and stores the average and current value"""
 

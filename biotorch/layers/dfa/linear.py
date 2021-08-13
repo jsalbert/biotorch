@@ -40,6 +40,7 @@ class Linear(nn.Linear):
 
         # Will use gradients computed in the backward hook
         self.register_backward_hook(self.dfa_backward_hook)
+        self.weight_diff = 0
 
     def forward(self, x):
         # Regular BackPropagation Forward-Backward
@@ -48,6 +49,11 @@ class Linear(nn.Linear):
                 self.weight = torch.nn.Parameter(self.weight * self.norm_initial_weights / torch.linalg.norm(self.weight))
 
         return LinearGrad.apply(x, self.weight, self.bias)
+
+    def compute_weight_difference(self):
+        with torch.no_grad():
+            self.weight_diff = torch.linalg.norm(self.weight_backward) / torch.linalg.norm(self.weight)
+        return self.weight_diff
 
     @staticmethod
     def dfa_backward_hook(module, grad_input, grad_output):

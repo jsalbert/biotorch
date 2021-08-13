@@ -1,4 +1,6 @@
 import math
+import pdb
+
 import torch
 import torch.nn as nn
 
@@ -65,17 +67,21 @@ class Conv2d(nn.Conv2d):
         if self.bias is not None:
             nn.init.constant_(self.bias, 1)
 
-        if self.options["constrain_weights"]:
+        if "constrain_weights" in self.options and self.options["constrain_weights"]:
             self.norm_initial_weights = torch.linalg.norm(self.weight)
 
-        if self.type == "usf":
+        if self.type == "usf" or self.type == "brsf":
             # Standard deviation of xavier init.
             fan_in, fan_out = torch.nn.init._calculate_fan_in_and_fan_out(self.weight)
             self.scaling_factor = math.sqrt(2.0 / float(fan_in + fan_out))
+            # Initialize backward weight for alignment computation
+            with torch.no_grad():
+                self.weight_backward = torch.nn.Parameter(self.scaling_factor * torch.sign(self.weight), requires_grad=False)
 
         self.alignment = 0
+        self.weight_diff = 0
 
-        if self.options["gradient_clip"]:
+        if "gradient_clip" in self.options and self.options["gradient_clip"]:
             self.register_backward_hook(self.gradient_clip)
 
     def forward(self, x):
@@ -83,7 +89,7 @@ class Conv2d(nn.Conv2d):
         with torch.no_grad():
             # Based on "Feedback alignment in deep convolutional networks" (https://arxiv.org/pdf/1812.06488.pdf)
             # Constrain weight magnitude
-            if self.options["constrain_weights"]:
+            if "constrain_weights" in self.options and self.options["constrain_weights"]:
                 self.weight = torch.nn.Parameter(
                     self.weight * self.norm_initial_weights / torch.linalg.norm(self.weight))
 
@@ -121,6 +127,11 @@ class Conv2d(nn.Conv2d):
     def compute_alignment(self):
         self.alignment = compute_matrix_angle(self.weight_backward, self.weight)
         return self.alignment
+
+    def compute_weight_difference(self):
+        with torch.no_grad():
+            self.weight_diff = torch.linalg.norm(self.weight_backward) / torch.linalg.norm(self.weight)
+        return self.weight_diff
 
     @staticmethod
     def gradient_clip(module, grad_input, grad_output):
