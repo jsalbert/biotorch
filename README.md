@@ -9,11 +9,13 @@
 ---
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-🧠 Provides implementations of layers, models and biologically plausible learning algorithms. Its aim is to build a model hub with the state-of-the-art models and methods in the field.
+BioTorch Provides:
 
-🧠 Provides a framework to benchmark and compare different biologically plausible learning algorithms in different datasets. 
+🧠 Implementations of layers, models and biologically plausible learning algorithms. It allows to load existing state-of-the-art models, easy creation of custom models and automatic conversion of any existing model.
 
-🧠 Provides a place of colaboration, ideas sharing and discussion.  
+🧠 A framework to train, evaluate and benchmark different biologically plausible learning algorithms in a selection of datasets. It is focused on the principles of PyTorch design and research reproducibility. Configuration files that include the choice of a fixed seed and deterministic math and CUDA operations are provided. 
+
+🧠 A place of colaboration, ideas sharing and discussion.  
 
 ## Methods Supported
 
