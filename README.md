@@ -23,7 +23,7 @@ BioTorch Provides:
 | :---         |     :---      | :---      |
 | [Feedback Alignment](https://arxiv.org/abs/1411.0247)    | `'fa'`     |[]|
 | [Direct Feedback Alignment](https://arxiv.org/abs/1609.01596)    |   `'dfa'`     |[[Torch]](https://github.com/anokland/dfa-torch) |
-| Sign Symmetry([[1]](https://arxiv.org/pdf/1510.05067.pdf), [[2]](https://arxiv.org/abs/1811.03567))    | `['usf', 'brsf', 'frsf']`  | [[PyTorch]](https://github.com/willwx/sign-symmetry)|
+| [Sign Symmetry](https://arxiv.org/pdf/1510.05067.pdf) ([[2](https://arxiv.org/abs/1811.03567)])    | `['usf', 'brsf', 'frsf']`  | [[PyTorch]](https://github.com/willwx/sign-symmetry)|
 
 There is a branch implementing 
 [Weight Mirroring](https://arxiv.org/abs/1904.05391)     |  `'weight_mirroring'` | [[Python]](https://github.com/makrout/Deep-Learning-without-Weight-Transport) | 
