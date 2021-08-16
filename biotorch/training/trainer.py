@@ -41,7 +41,7 @@ class Trainer:
         self.record_weight_ratio = metrics_config['weight_ratio']
         self.top_k = metrics_config['top_k']
         self.writer = SummaryWriter(self.logs_dir)
-        self.layer_alignment_modes = ['weight_mirroring', 'fa', 'usf', 'frsf', 'brsf']
+        self.layer_alignment_modes = ['fa', 'usf', 'frsf', 'brsf']
 
     def write_layer_alignment(self, epoch):
         if self.record_layer_alignment:
@@ -65,21 +65,6 @@ class Trainer:
 
     def run(self):
         self.best_acc = 0.0
-
-        # Warming-up: If weight mirroring we enter "mirror mode" for a few epochs
-        if self.mode == 'weight_mirroring':
-            print('Warming up, Mirroring mode for a few epochs...')
-            iterations_epoch = len(self.train_dataloader) // self.train_dataloader.batch_size
-            noise_size = (self.train_dataloader.batch_size,) + self.train_dataloader.dataset[0][0].size()
-            x = torch.randn(noise_size).to(self.device)
-            for i in range(0, iterations_epoch * 20):
-                if self.multi_gpu:
-                    self.model.module.mirror_weights(x, growth_control=True)
-                else:
-                    self.model.mirror_weights(x, growth_control=True)
-            layers_alignment = compute_angles_module(self.model)
-            print(layers_alignment)
-            print('Warm-up completed')
 
         for epoch in range(self.epochs):
             self.write_layer_alignment(epoch)
