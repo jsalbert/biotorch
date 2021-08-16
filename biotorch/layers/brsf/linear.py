@@ -15,6 +15,7 @@ class Linear(fa_constructor.Linear):
     (https://arxiv.org/pdf/1510.05067.pdf)
 
     """
+
     def __init__(self, in_features: int, out_features: int, bias: bool = True, layer_config: dict = None) -> None:
         if layer_config is None:
             layer_config = {}

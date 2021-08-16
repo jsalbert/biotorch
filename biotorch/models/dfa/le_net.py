@@ -14,7 +14,7 @@ def le_net_mnist(pretrained: bool = False, progress: bool = True, num_classes: i
         num_classes (int): Output dimension of the last linear layer
     """
     print('Converting LeNet CNN MNIST to {} mode'.format(MODE_STRING))
-    return create_le_net_biomodel(le_net.le_net_mnist, MODE, layer_config,  pretrained, progress, num_classes)
+    return create_le_net_biomodel(le_net.le_net_mnist, MODE, layer_config, pretrained, progress, num_classes)
 
 
 def le_net_cifar(pretrained: bool = False, progress: bool = True, num_classes: int = 10, layer_config=None):
@@ -25,4 +25,4 @@ def le_net_cifar(pretrained: bool = False, progress: bool = True, num_classes: i
         num_classes (int): Output dimension of the last linear layer
     """
     print('Converting LeNet CNN CIFAR to {} mode'.format(MODE_STRING))
-    return create_le_net_biomodel(le_net.le_net_cifar, MODE, layer_config,  pretrained, progress, num_classes)
+    return create_le_net_biomodel(le_net.le_net_cifar, MODE, layer_config, pretrained, progress, num_classes)

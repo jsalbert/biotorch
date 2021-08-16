@@ -5,7 +5,7 @@ from biotorch.module.biomodule import BioModule
 
 def create_resnet_biomodel(model_architecture,
                            mode,
-                           layer_config:dict = None,
+                           layer_config: dict = None,
                            pretrained: bool = False,
                            progress: bool = True,
                            num_classes: int = 1000) -> BioModule:
@@ -20,11 +20,11 @@ def create_resnet_biomodel(model_architecture,
 
 
 def create_le_net_biomodel(model_architecture,
-                               mode,
-                               layer_config:dict = None,
-                               pretrained: bool = False,
-                               progress: bool = True,
-                               num_classes: int = 10) -> BioModule:
+                           mode,
+                           layer_config: dict = None,
+                           pretrained: bool = False,
+                           progress: bool = True,
+                           num_classes: int = 10) -> BioModule:
 
     model = model_architecture(pretrained, progress, num_classes=num_classes)
 

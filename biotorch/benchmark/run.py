@@ -43,7 +43,7 @@ class Benchmark:
         # Parse config file
         self.gpus = self.config_file['infrastructure']['gpus']
         self.model_config = self.config_file['model']
-        
+
         if 'training' not in self.config_file:
             self.benchmark_mode = 'evaluation'
         else:

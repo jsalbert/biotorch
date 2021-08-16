@@ -12,6 +12,7 @@ class Linear(fa_constructor.Linear):
     weight_backward = sign(weight)
 
     """
+
     def __init__(self, in_features: int, out_features: int, bias: bool = True, layer_config: dict = None) -> None:
         if layer_config is None:
             layer_config = {}
