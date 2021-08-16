@@ -9,17 +9,13 @@
 ---
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-🧠 Provides implementations of layers, models and biologically plausible learning algorithms. Its aim is to build a model hub with the state-of-the-art models and methods in the field.
+BioTorch Provides:
 
-🧠 Provides a framework to benchmark and compare different biologically plausible learning algorithms in different datasets. 
+🧠 Implementations of layers, models and biologically plausible learning algorithms. It allows to load existing state-of-the-art models, easy creation of custom models and automatic conversion of any existing model.
 
-🧠 Provides a place of colaboration, ideas sharing and discussion.  
+🧠 A framework to train, evaluate and benchmark different biologically plausible learning algorithms in a selection of datasets. It is focused on the principles of PyTorch design and research reproducibility. Configuration files that include the choice of a fixed seed and deterministic math and CUDA operations are provided. 
 
-## Motivation
-
-During learning, the brain modifies synapses to improve behaviour. In the cortex, synapses are embedded within multilayered networks, making it difficult to determine the effect of an individual synaptic modification on the behaviour of the system. The backpropagation algorithm solves this problem in deep artificial neural networks, but historically it has been viewed as biologically problematic. Nonetheless, recent developments in neuroscience and the successes of artificial neural networks have reinvigorated interest in whether backpropagation offers insights for understanding learning in the cortex. The backpropagation algorithm learns quickly by computing synaptic updates using feedback connections to deliver error signals. Although feedback connections are ubiquitous in the cortex, it is difficult to see how they could deliver the error signals required by strict formulations of backpropagation.
-
-_Lillicrap, T. P., Santoro, A., Marris, L., Akerman, C. J., & Hinton, G. (2020). Backpropagation and the brain. Nature Reviews Neuroscience, 21(6), 335-346._
+🧠 A place of colaboration, ideas sharing and discussion.  
 
 ## Methods Supported
 
@@ -27,29 +23,77 @@ _Lillicrap, T. P., Santoro, A., Marris, L., Akerman, C. J., & Hinton, G. (2020).
 | :---         |     :---      | :---      |
 | [Feedback Alignment](https://arxiv.org/abs/1411.0247)    | `'fa'`     |[]|
 | [Direct Feedback Alignment](https://arxiv.org/abs/1609.01596)    |   `'dfa'`     |[[Torch]](https://github.com/anokland/dfa-torch) |
-| Sign Symmetry([[1]](https://arxiv.org/pdf/1510.05067.pdf), [[2]](https://arxiv.org/abs/1811.03567))    | `['sign_1', 'sign_2', 'sign_3']`  | [[PyTorch]](https://github.com/willwx/sign-symmetry)|
-| [Weight Mirroring](https://arxiv.org/abs/1904.05391)     |  `'weight_mirroring'` | [[Python]](https://github.com/makrout/Deep-Learning-without-Weight-Transport) |
+| Sign Symmetry([[1]](https://arxiv.org/pdf/1510.05067.pdf), [[2]](https://arxiv.org/abs/1811.03567))    | `['usf', 'brsf', 'frsf']`  | [[PyTorch]](https://github.com/willwx/sign-symmetry)|
+
+There is a branch implementing 
+[Weight Mirroring](https://arxiv.org/abs/1904.05391)     |  `'weight_mirroring'` | [[Python]](https://github.com/makrout/Deep-Learning-without-Weight-Transport) | 
+
+## How to use?
+
+### Create a Feedback Aligment (FA) ResNet-18 model
+
+```python
+from biotorch.models.fa import resnet18
+model = resnet18()
+```
+
+### Create a custom model with uSF layers
+
+```python
+import torch.nn.functional as F
+from biotorch.layers.usf import Conv2d
+
+class Model(nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+        self.conv1 = Conv2d(1, 20, 5)
+        self.conv2 = Conv2d(20, 20, 5)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        return F.relu(self.conv2(x))
+model = Model()
+```
+
+### Automatically convert AlexNet to use the "frSF" algorithm
+
+```python
+from torchvision.models import alexnet
+from biotorch.module.biomodule import BioModule
+
+model = BioModule(module=alexnet(), mode='frsf')
+```
 
 ## Benchmarks
 
+### MNIST & Fashion-MNIST
+The training set is split into a 60k training and 10k validation partitions. The model with best validation accuracy is then benchmarked with the same validation set of 10k samples. The model used to compare is LeNet MNIST.
+The Top-1 Classification Error Rate is shown in the table.
+
+| Algorithm | MNIST | Fashion MNIST |
+|-----------|-------|---------------|
+| BP        | 0.84  | 8.88          |
+| FA        | 1.91  | 12.77         |
+| uSF       | 0.83  | 9.22          |
+| brSF      | 0.79  | 9.31          |
+| frSF      | 0.92  | 9.27          |
+| DFA       | 1.71  | 12.76         |
+
 ### CIFAR 10
 
-The training procedure is as in the [ResNet paper by He, Kaiming, et al.](https://arxiv.org/abs/1512.03385), the training dataset is split into a 45k training and 5k validation partitions. The model with best validation accuracy is then benchmarked with the testing set of 10k samples. 
+The training set is split into a 45k training and 5k validation partitions. The model with best validation accuracy is then benchmarked with the testing set of 10k samples as in [He, Kaiming, et al.](https://arxiv.org/abs/1512.03385). 
+The models used to compare are LeNet CIFAR10, ResNet-20 and ResNet-56. The configuration files attached contain the exact hyperparameters used per method. 
+The Top-1 Classification Error Rate is shown in the table.
 
-The model used to compare is **ResNet-20**. 
+| Algorithm | LeNet | LeNet (Adam) | ResNet-20 | ResNet-20 (Adam) | ResNet-56 (Adam) |
+|-----------|-------|--------------|-----------|------------------|------------------|
+| BP        | 14.52 | 16.37        | 9.42      | 10.27            | 7.91             |
+| FA        | 44.15 | 36.35        | 36.38     | 29.16            | 33.04            |
+| uSF       | 16.81 | 16.34        | 15.01     | 10.56            | 10.59            |
+| brSF      | 17.08 | 17.12        | 14.95     | 11.24            | 13.52            |
+| frSF      | 16.95 | 16.58        | 16.94     | 11.29            | 11.5             |
+| DFA       | 52.7  | 36.29        | 39.35     | 37.7             | 35.44            |
 
-For backpropagation the training was done as in ([He, Kaiming, et al.](https://arxiv.org/abs/1512.03385)), for the rest of methods we trained with batch size of 128, for 300 epochs reducing the initial learning rate by a factor of 10 at 100, 200, and 250. The configuration file attached contain the exact hyperparameters used per method. 
-| Method  | Acc@1 | Err@1| 
-| :---         |     :---      | :--- |
-| Backpropagation| 91.28 % | 8.72 % |
-| Feedback Alignment|   67.10 %   |    32.90 %    |
-| Direct Feedback Alignment|   65.49 %      | 34.51 % |
-| Sign Symmetry (1) (uSF)| 85.18 %  |  14.82 %    |
-| Sign Symmetry (2) (brSF)|  31.07 %  |  68.93 %      |
-| Sign Symmetry (3) (frSF)|  47.30 %  |  52.70 %      |
-| Weight Mirroring| %  |  %   |
-
-*There has not been a large hyperparameter search, just enough to make methods converge and benchmark against backprop in very similar training conditions.* 
 
 ### ImageNet
 
