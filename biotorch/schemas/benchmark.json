@@ -114,7 +114,10 @@
       },
       "additionalProperties": false,
       "required": [
-        "name"
+        "top_k",
+        "display_iterations",
+        "weight_ratio",
+        "layer_alignment"
       ]
     },
     "optimizer": {
@@ -227,7 +230,8 @@
     },
     "additionalProperties": false,
     "required": [
-      "hyperparameters"
+      "hyperparameters",
+      "metrics"
     ]
   },
   "model": {

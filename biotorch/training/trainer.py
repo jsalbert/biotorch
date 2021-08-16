@@ -56,7 +56,7 @@ class Trainer:
                 print('Layer alignment is not implemented for  {}'.format(self.mode))
 
     def write_weight_ratio(self, epoch):
-        if record_weight_ratio:
+        if self.record_weight_ratio:
             try:
                 weight_difference = compute_weight_ratio_module(self.model, self.mode)
                 self.writer.add_scalars('weight_difference/train', weight_difference, epoch)

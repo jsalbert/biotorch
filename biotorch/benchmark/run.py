@@ -144,7 +144,7 @@ class Benchmark:
         self.lr_scheduler = create_lr_scheduler(self.lr_scheduler_config, self.optimizer)
 
         print('\nBenchmarking model on {}'.format(str(self.dataset)))
-
+        print(self.metrics_config)
         trainer = Trainer(model=self.model,
                           mode=self.mode,
                           loss_function=self.loss_function,
