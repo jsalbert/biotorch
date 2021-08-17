@@ -17,8 +17,7 @@ class BioModule(nn.Module):
         self.layer_config = layer_config
         if self.mode == 'dfa':
             if self.output_dim is None:
-                raise ValueError('You need to introduce the `output_dim` of your model for '
-                                 'Direct Feedback Alignment mode')
+                raise ValueError('Model `output_dim` is required for Direct Feedback Alignment (dfa) mode')
         if mode != 'BP':
             module_converter = ModuleConverter(mode=self.mode)
             self.module = module_converter.convert(self.module, self.copy_weights, self.layer_config, self.output_dim)

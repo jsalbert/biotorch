@@ -1,7 +1,6 @@
 from biotorch.datasets.cifar import CIFAR10, CIFAR10Benchmark, CIFAR100
 from biotorch.datasets.mnist import MNIST
 from biotorch.datasets.fashion_mnist import FashionMNIST
-from biotorch.datasets.tiny_imagenet import TinyImageNet
 from biotorch.datasets.imagenet import ImageNet
 
 

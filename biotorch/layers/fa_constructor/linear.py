@@ -1,6 +1,7 @@
 import math
 import torch
 import torch.nn as nn
+from torch import Tensor
 
 from biotorch.autograd.fa.linear import LinearGrad
 from biotorch.layers.metrics import compute_matrix_angle
@@ -19,34 +20,30 @@ class Linear(nn.Linear):
         if "options" not in self.layer_config:
             self.layer_config["options"] = {
                 "constrain_weights": False,
-                "gradient_clip": False
+                "gradient_clip": False,
+                "init": "xavier"
             }
 
         self.options = self.layer_config["options"]
         self.type = self.layer_config["type"]
+        self.init = self.options["init"]
 
-        nn.init.xavier_uniform_(self.weight)
-        self.bias_backward = None
-
-        if self.type in ["fa", "frsf"]:
-            self.weight_backward = nn.Parameter(torch.Tensor(self.weight.size()), requires_grad=False)
-            nn.init.xavier_uniform_(self.weight_backward)
-            if self.type == "frsf":
-                self.weight_backward = nn.Parameter(torch.abs(self.weight_backward), requires_grad=False)
-            if self.bias is not None:
-                self.bias_backward = nn.Parameter(torch.Tensor(self.bias.size()), requires_grad=False)
-                nn.init.constant_(self.bias_backward, 1)
-
+        self.weight_backward = nn.Parameter(torch.Tensor(self.weight.size()), requires_grad=False)
         if self.bias is not None:
-            nn.init.constant_(self.bias, 1)
+            self.bias_backward = nn.Parameter(torch.Tensor(self.bias.size()), requires_grad=False)
+        else:
+            self.register_parameter("bias", None)
+            self.bias_backward = None
+
+        self.init_parameters()
+
+        if self.type == "frsf":
+            self.weight_backward = nn.Parameter(torch.abs(self.weight_backward), requires_grad=False)
 
         if "constrain_weights" in self.options and self.options["constrain_weights"]:
             self.norm_initial_weights = torch.linalg.norm(self.weight)
 
         if self.type == "usf" or self.type == "brsf":
-            # Standard deviation of xavier init.
-            fan_in, fan_out = torch.nn.init._calculate_fan_in_and_fan_out(self.weight)
-            self.scaling_factor = math.sqrt(2.0 / float(fan_in + fan_out))
             # Initialize backward weight for alignment computation
             with torch.no_grad():
                 self.weight_backward = torch.nn.Parameter(self.scaling_factor * torch.sign(self.weight),
@@ -58,7 +55,29 @@ class Linear(nn.Linear):
         if "gradient_clip" in self.options and self.options["gradient_clip"]:
             self.register_backward_hook(self.gradient_clip)
 
-    def forward(self, x):
+    def init_parameters(self) -> None:
+        fan_in, fan_out = nn.init._calculate_fan_in_and_fan_out(self.weight)
+        # Xavier initialization
+        if self.init == "xavier":
+            nn.init.xavier_uniform_(self.weight)
+            nn.init.xavier_uniform_(self.weight_backward)
+            # Scaling factor is the standard deviation of xavier init.
+            self.scaling_factor = math.sqrt(2.0 / float(fan_in + fan_out))
+            if self.bias is not None:
+                nn.init.constant_(self.bias, 0)
+                nn.init.constant_(self.bias_backward, 0)
+        # Pytorch Default (Kaiming)
+        else:
+            nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
+            nn.init.kaiming_uniform_(self.weight_backward, a=math.sqrt(5))
+            # Scaling factor is the standard deviation of Kaiming init.
+            self.scaling_factor = 1 / math.sqrt(3 * fan_in)
+            if self.bias is not None:
+                bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
+                nn.init.uniform_(self.bias, -bound, bound)
+                nn.init.uniform_(self.bias_backward, -bound, bound)
+
+    def forward(self, x: Tensor) -> Tensor:
         weight_backward = None
         with torch.no_grad():
             # Based on "Feedback alignment in deep convolutional networks" (https://arxiv.org/pdf/1812.06488.pdf)
@@ -76,7 +95,10 @@ class Linear(nn.Linear):
                 self.weight_backward = weight_backward
             elif self.type == "brsf":
                 wb = torch.Tensor(self.weight.size()).to(self.weight.device)
-                torch.nn.init.xavier_uniform_(wb)
+                if self.init == "xavier":
+                    torch.nn.init.xavier_uniform_(wb)
+                else:
+                    init.kaiming_uniform_(wb, a=math.sqrt(5))
                 weight_backward = torch.nn.Parameter(torch.abs(wb) * torch.sign(self.weight), requires_grad=False)
                 self.weight_backward = weight_backward
             elif self.type == "frsf":

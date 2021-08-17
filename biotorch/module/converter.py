@@ -10,13 +10,13 @@ class ModuleConverter:
         # Compute original model layer counts
         layer_counts = self.count_layers(module)
         # Replace layers
-        replaced_layers_counts = defaultdict(lambda: 0)
-        self._replace_layers_recursive(module, self.mode, copy_weights, layer_config, output_dim, replaced_layers_counts)
+        self.replaced_layers_counts = defaultdict(lambda: 0)
+        self._replace_layers_recursive(module, self.mode, copy_weights, layer_config, output_dim, self.replaced_layers_counts)
         # Sanity Check
         print('Module has been converted to {} mode:\n'.format(self.mode))
         if layer_config is not None:
             print('The layer configuration was: ', layer_config)
-        for layer, count in replaced_layers_counts.items():
+        for layer, count in self.replaced_layers_counts.items():
             if layer_counts[layer] != count:
                 print('- There were originally {} {} layers and {} were converted.'.format(layer_counts[layer],
                                                                                            layer,

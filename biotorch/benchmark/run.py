@@ -14,6 +14,7 @@ from types import ModuleType
 from biotorch.training.trainer import Trainer
 from biotorch.evaluation.evaluator import Evaluator
 from biotorch.utils.utils import read_yaml, mkdir
+from biotorch.models.utils import apply_xavier_init
 from biotorch.utils.validator import validate_config
 from biotorch.datasets.selector import DatasetSelector
 from biotorch.benchmark.optimizers import create_optimizer
@@ -124,6 +125,10 @@ class Benchmark:
                     pretrained=self.model_config['pretrained'],
                     num_classes=self.num_classes,
                 )
+                # To have same initialization conditions as the biologically plausible layers
+                if 'options' in self.layer_config and 'init' in self.layer_config['options']:
+                    if self.layer_config['options']['init'] == 'xavier':
+                        self.model.apply(apply_xavier_init)
             else:
                 self.model = models.__dict__[self.mode].__dict__[arch](
                     pretrained=self.model_config['pretrained'],
@@ -145,6 +150,7 @@ class Benchmark:
 
         print('\nBenchmarking model on {}'.format(str(self.dataset)))
         print(self.metrics_config)
+
         trainer = Trainer(model=self.model,
                           mode=self.mode,
                           loss_function=self.loss_function,
