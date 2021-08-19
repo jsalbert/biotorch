@@ -49,8 +49,8 @@ class Conv2d(nn.Conv2d):
         self.init = self.options["init"]
         self.loss_gradient = None
         self.weight_backward = nn.Parameter(torch.Tensor(size=(output_dim, self.in_channels,
-                                                          self.kernel_size[0],
-                                                          self.kernel_size[1])),
+                                                               self.kernel_size[0],
+                                                               self.kernel_size[1])),
                                             requires_grad=False)
 
         self.bias_backward = None
@@ -59,7 +59,7 @@ class Conv2d(nn.Conv2d):
 
         self.init_parameters()
 
-        if self.options["constrain_weights"]:
+        if "constrain_weights" in self.options and self.options["constrain_weights"]:
             self.norm_initial_weights = torch.linalg.norm(self.weight)
 
         # Will use gradients computed in the backward hook
@@ -96,7 +96,7 @@ class Conv2d(nn.Conv2d):
     def forward(self, x):
         # Regular BackPropagation Forward-Backward
         with torch.no_grad():
-            if self.options["constrain_weights"]:
+            if "constrain_weights" in self.options and self.options["constrain_weights"]:
                 self.weight = torch.nn.Parameter(self.weight * self.norm_initial_weights / torch.linalg.norm(self.weight))
 
         return Conv2dGrad.apply(x,

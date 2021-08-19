@@ -30,7 +30,7 @@ class Linear(nn.Linear):
 
         self.init_parameters()
 
-        if self.options["constrain_weights"]:
+        if "constrain_weights" in self.options and self.options["constrain_weights"]:
             with torch.no_grad():
                 self.norm_initial_weights = torch.linalg.norm(self.weight)
 
@@ -63,7 +63,7 @@ class Linear(nn.Linear):
     def forward(self, x):
         # Regular BackPropagation Forward-Backward
         with torch.no_grad():
-            if self.options["constrain_weights"]:
+            if "constrain_weights" in self.options and self.options["constrain_weights"]:
                 self.weight = torch.nn.Parameter(self.weight * self.norm_initial_weights / torch.linalg.norm(self.weight))
 
         return LinearGrad.apply(x, self.weight, self.bias)

@@ -26,7 +26,5 @@ class DatasetSelector:
             return MNIST
         elif self.dataset_name == 'fashion_mnist':
             return FashionMNIST
-        elif self.dataset_name == 'tiny_imagenet':
-            return TinyImageNet
         elif self.dataset_name == 'imagenet':
             return ImageNet

@@ -120,21 +120,13 @@ class Benchmark:
                 print("=> Using pre-trained model '{}'".format(self.model_config['architecture']))
             else:
                 print("=> Creating model from scratch '{}'".format(self.model_config['architecture']))
-            if self.mode == 'backpropagation':
-                self.model = models.__dict__[self.mode].__dict__[arch](
-                    pretrained=self.model_config['pretrained'],
-                    num_classes=self.num_classes,
-                )
-                # To have same initialization conditions as the biologically plausible layers
-                if 'options' in self.layer_config and 'init' in self.layer_config['options']:
-                    if self.layer_config['options']['init'] == 'xavier':
-                        self.model.apply(apply_xavier_init)
-            else:
+
                 self.model = models.__dict__[self.mode].__dict__[arch](
                     pretrained=self.model_config['pretrained'],
                     num_classes=self.num_classes,
                     layer_config=self.layer_config
                 )
+
         elif self.model_config['checkpoint'] is not None:
             print('Loading model checkpoint from ', self.model_config['checkpoint'])
             self.model = torch.load(self.model_config['checkpoint'], map_location=self.device)

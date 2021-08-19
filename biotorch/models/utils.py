@@ -36,4 +36,5 @@ def create_le_net_biomodel(model_architecture,
 def apply_xavier_init(module):
     if isinstance(module, nn.Linear) or isinstance(module, nn.Conv2d):
         nn.init.xavier_uniform_(module.weight)
-        nn.init.constant_(module.bias, 0)
+        if module.bias is not None:
+            nn.init.constant_(module.bias, 0)

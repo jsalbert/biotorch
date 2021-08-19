@@ -1,3 +1,2 @@
-from torchvision.models import *
-from biotorch.models.small_resnet import *
-from biotorch.models.le_net import *
+from biotorch.models.backpropagation.resnet import *
+from biotorch.models.backpropagation.le_net import *
