@@ -14,6 +14,7 @@ from types import ModuleType
 from biotorch.training.trainer import Trainer
 from biotorch.evaluation.evaluator import Evaluator
 from biotorch.utils.utils import read_yaml, mkdir
+from biotorch.models.utils import apply_xavier_init
 from biotorch.utils.validator import validate_config
 from biotorch.datasets.selector import DatasetSelector
 from biotorch.benchmark.optimizers import create_optimizer
@@ -43,7 +44,7 @@ class Benchmark:
         # Parse config file
         self.gpus = self.config_file['infrastructure']['gpus']
         self.model_config = self.config_file['model']
-        
+
         if 'training' not in self.config_file:
             self.benchmark_mode = 'evaluation'
         else:
@@ -119,17 +120,13 @@ class Benchmark:
                 print("=> Using pre-trained model '{}'".format(self.model_config['architecture']))
             else:
                 print("=> Creating model from scratch '{}'".format(self.model_config['architecture']))
-            if self.mode == 'backpropagation':
-                self.model = models.__dict__[self.mode].__dict__[arch](
-                    pretrained=self.model_config['pretrained'],
-                    num_classes=self.num_classes,
-                )
-            else:
+
                 self.model = models.__dict__[self.mode].__dict__[arch](
                     pretrained=self.model_config['pretrained'],
                     num_classes=self.num_classes,
                     layer_config=self.layer_config
                 )
+
         elif self.model_config['checkpoint'] is not None:
             print('Loading model checkpoint from ', self.model_config['checkpoint'])
             self.model = torch.load(self.model_config['checkpoint'], map_location=self.device)
@@ -145,6 +142,7 @@ class Benchmark:
 
         print('\nBenchmarking model on {}'.format(str(self.dataset)))
         print(self.metrics_config)
+
         trainer = Trainer(model=self.model,
                           mode=self.mode,
                           loss_function=self.loss_function,

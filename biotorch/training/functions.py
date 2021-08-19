@@ -19,7 +19,7 @@ def train(model,
     data_time = AverageMeter('Data', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
     top1 = AverageMeter('Acc@1', ':6.2f')
-    topk = AverageMeter('Acc@'+str(top_k), ':6.2f')
+    topk = AverageMeter('Acc@' + str(top_k), ':6.2f')
     progress = ProgressMeter(
         len(train_dataloader),
         [batch_time, data_time, losses, top1, topk],
@@ -84,7 +84,7 @@ def test(model,
     batch_time = AverageMeter('Time', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
     top1 = AverageMeter('Acc@1', ':6.2f')
-    topk = AverageMeter('Acc@'+str(top_k), ':6.2f')
+    topk = AverageMeter('Acc@' + str(top_k), ':6.2f')
 
     # Switch to evaluate mode
     model.eval()

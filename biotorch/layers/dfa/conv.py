@@ -41,32 +41,52 @@ class Conv2d(nn.Conv2d):
         if "options" not in self.layer_config:
             self.layer_config["options"] = {
                 "constrain_weights": False,
-                "scaling_factor": False,
+                "init": "xavier",
                 "gradient_clip": False
             }
 
         self.options = self.layer_config["options"]
+        self.init = self.options["init"]
         self.loss_gradient = None
-        self.weight_dfa = nn.Parameter(torch.Tensor(size=(output_dim, self.in_channels, self.kernel_size[0], self.kernel_size[1])),
-                                       requires_grad=False)
-        nn.init.xavier_uniform_(self.weight)
-        nn.init.xavier_uniform_(self.weight_dfa)
+        self.weight_backward = nn.Parameter(torch.Tensor(size=(output_dim, self.in_channels,
+                                                               self.kernel_size[0],
+                                                               self.kernel_size[1])),
+                                            requires_grad=False)
 
-        self.bias_dfa = None
+        self.bias_backward = None
         if self.bias is not None:
-            self.bias_dfa = nn.Parameter(torch.Tensor(size=(output_dim, self.in_channels)), requires_grad=False)
-            nn.init.constant_(self.bias, 1)
-            nn.init.constant_(self.bias_dfa, 1)
+            self.bias_backward = nn.Parameter(torch.Tensor(size=(output_dim, self.in_channels)), requires_grad=False)
 
-        if self.options["constrain_weights"]:
+        self.init_parameters()
+
+        if "constrain_weights" in self.options and self.options["constrain_weights"]:
             self.norm_initial_weights = torch.linalg.norm(self.weight)
-
-        if self.options["scaling_factor"]:
-            raise ValueError('scaling_factor not supported for DFA')
 
         # Will use gradients computed in the backward hook
         self.register_backward_hook(self.dfa_backward_hook)
         self.weight_ratio = 0
+
+    def init_parameters(self) -> None:
+        # Xavier initialization
+        fan_in, fan_out = nn.init._calculate_fan_in_and_fan_out(self.weight)
+        if self.init == "xavier":
+            nn.init.xavier_uniform_(self.weight)
+            nn.init.xavier_uniform_(self.weight_backward)
+            # Scaling factor is the standard deviation of xavier init.
+            self.scaling_factor = math.sqrt(2.0 / float(fan_in + fan_out))
+            if self.bias is not None:
+                nn.init.constant_(self.bias, 0)
+                nn.init.constant_(self.bias_backward, 0)
+        # Pytorch Default (Kaiming)
+        else:
+            nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
+            nn.init.kaiming_uniform_(self.weight_backward, a=math.sqrt(5))
+            # Scaling factor is the standard deviation of Kaiming init.
+            self.scaling_factor = 1 / math.sqrt(3 * fan_in)
+            if self.bias is not None:
+                bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
+                nn.init.uniform_(self.bias, -bound, bound)
+                nn.init.uniform_(self.bias_backward, -bound, bound)
 
     def compute_weight_ratio(self):
         with torch.no_grad():
@@ -76,7 +96,7 @@ class Conv2d(nn.Conv2d):
     def forward(self, x):
         # Regular BackPropagation Forward-Backward
         with torch.no_grad():
-            if self.options["constrain_weights"]:
+            if "constrain_weights" in self.options and self.options["constrain_weights"]:
                 self.weight = torch.nn.Parameter(self.weight * self.norm_initial_weights / torch.linalg.norm(self.weight))
 
         return Conv2dGrad.apply(x,
@@ -96,7 +116,7 @@ class Conv2d(nn.Conv2d):
             out_grad = module.loss_gradient.unsqueeze(2).repeat(1, 1, grad_output[0].size()[2])
             out_grad = out_grad.unsqueeze(3).repeat(1, 1, 1, grad_output[0].size()[3])
             grad_dfa = torch.nn.grad.conv2d_input(input_size=grad_input[0].shape,
-                                                  weight=module.weight_dfa,
+                                                  weight=module.weight_backward,
                                                   grad_output=out_grad,
                                                   stride=module.stride,
                                                   padding=module.padding,

@@ -18,7 +18,7 @@ Reference:
 [1] Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun
     Deep Residual Learning for Image Recognition. arXiv:1512.03385
 
-This code is based in the implementation by Yerlan Idelbayev 
+This code is based in the implementation by Yerlan Idelbayev
 (https://github.com/akamaster/pytorch_resnet_cifar10)
 
 """
@@ -91,7 +91,7 @@ class ResNet(nn.Module):
         self.fc = nn.Linear(64, num_classes)
 
     def _make_layer(self, block, planes, num_blocks, stride):
-        strides = [stride] + [1] * (num_blocks-1)
+        strides = [stride] + [1] * (num_blocks - 1)
         layers = []
         for stride in strides:
             layers.append(block(self.inplanes, planes, stride))

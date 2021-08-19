@@ -50,7 +50,7 @@ class Trainer:
                 try:
                     layers_alignment = compute_angles_module(self.model)
                     self.writer.add_scalars('layer_alignment/train', layers_alignment, epoch)
-                except:
+                except BaseException:
                     pass
             else:
                 print('Layer alignment is not implemented for  {}'.format(self.mode))
@@ -60,7 +60,7 @@ class Trainer:
             try:
                 weight_difference = compute_weight_ratio_module(self.model, self.mode)
                 self.writer.add_scalars('weight_difference/train', weight_difference, epoch)
-            except:
+            except BaseException:
                 pass
 
     def run(self):

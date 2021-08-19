@@ -18,6 +18,7 @@ class Conv2d(fa_constructor.Conv2d):
 
     (https://arxiv.org/pdf/1510.05067.pdf)
     """
+
     def __init__(
             self,
             in_channels: int,

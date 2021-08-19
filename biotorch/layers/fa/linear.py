@@ -14,4 +14,3 @@ class Linear(fa_constructor.Linear):
         layer_config["type"] = "fa"
 
         super(Linear, self).__init__(in_features, out_features, bias, layer_config)
-

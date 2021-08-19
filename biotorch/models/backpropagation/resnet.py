@@ -4,8 +4,9 @@ import biotorch.models.small_resnet as small_resnet
 from torchvision.models.resnet import ResNet
 from biotorch.models.utils import create_resnet_biomodel
 
-MODE = 'brsf'
-MODE_STRING = 'Sign Alignment: Batchwise Random Magnitude Sign-concordant Feedbacks (brSF)'
+
+MODE = 'backpropagation'
+MODE_STRING = 'Backpropagation'
 
 
 def resnet18(pretrained: bool = False, progress: bool = True, num_classes: int = 1000, layer_config=None) -> ResNet:

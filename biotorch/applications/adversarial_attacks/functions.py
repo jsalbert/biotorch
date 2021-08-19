@@ -92,4 +92,3 @@ def apply_attack_on_batch(model, images, labels, attack, device):
     print('Clean Accuracy on Batch: {}%'.format(clean_accuracy))
     print('Robust Accuracy on Batch: {}%'.format(robust_accuracy))
     return adv_images.cpu(), adversarial_success, clean_accuracy, robust_accuracy
-

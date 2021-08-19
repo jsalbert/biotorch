@@ -2,8 +2,8 @@ import biotorch.models.le_net as le_net
 from biotorch.models.utils import create_le_net_biomodel
 
 
-MODE = 'fa'
-MODE_STRING = 'Feedback Alignment'
+MODE = 'backpropagation'
+MODE_STRING = 'Backpropagation'
 
 
 def le_net_mnist(pretrained: bool = False, progress: bool = True, num_classes: int = 10, layer_config=None):

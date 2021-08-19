@@ -11,11 +11,11 @@ class FashionMNIST(Dataset):
         self.std = (0.3530,)
         self.num_classes = 10
         super(FashionMNIST, self).__init__(target_size=target_size,
-                                    dataset_path=dataset_path,
-                                    mean=self.mean,
-                                    std=self.std,
-                                    train_transforms=train_transforms,
-                                    test_transforms=test_transforms)
+                                           dataset_path=dataset_path,
+                                           mean=self.mean,
+                                           std=self.std,
+                                           train_transforms=train_transforms,
+                                           test_transforms=test_transforms)
 
         print('Preparing {} and storing data in {}'.format(str(self), dataset_path))
 

@@ -31,9 +31,9 @@ class CIFAR100(Dataset):
         )
 
         self.val_dataset = datasets.CIFAR100(self.dataset_path,
-                                              train=False,
-                                              download=True,
-                                              transform=transforms.Compose(self.test_transforms)
+                                             train=False,
+                                             download=True,
+                                             transform=transforms.Compose(self.test_transforms)
                                              )
 
         self.test_dataset = datasets.CIFAR100(self.dataset_path,
@@ -94,11 +94,11 @@ class CIFAR10Benchmark(Dataset):
         self.num_classes = 10
 
         super(CIFAR10Benchmark, self).__init__(target_size=target_size,
-                                      dataset_path=dataset_path,
-                                      mean=self.mean,
-                                      std=self.std,
-                                      train_transforms=train_transforms,
-                                      test_transforms=test_transforms)
+                                               dataset_path=dataset_path,
+                                               mean=self.mean,
+                                               std=self.std,
+                                               train_transforms=train_transforms,
+                                               test_transforms=test_transforms)
 
         print('Preparing {} and storing data in {}'.format(str(self), dataset_path))
 
