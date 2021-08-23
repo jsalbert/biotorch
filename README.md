@@ -28,7 +28,8 @@ BioTorch Provides:
 There is a branch implementing 
 [Weight Mirroring](https://arxiv.org/abs/1904.05391)     |  `'weight_mirroring'` | [[Python]](https://github.com/makrout/Deep-Learning-without-Weight-Transport) | 
 
-## How to use?
+
+## Quick Tour
 
 ### Create a Feedback Aligment (FA) ResNet-18 model
 
@@ -64,36 +65,36 @@ from biotorch.module.biomodule import BioModule
 model = BioModule(module=alexnet(), mode='frsf')
 ```
 
+### Run an experiment on the command line
+
+```bash
+python benchmark.py --config benchmark_configs/mnist/fa.yaml
+```
+
+If you want the experiment to be reproducible, check that you have specified a seed and the parameter `deterministic`is set to True in the configuration file yaml. That will apply all the [PyTorch reproducibility steps](https://pytorch.org/docs/stable/notes/randomness.html). 
+If you are running your experiment on GPU add the extra environment variable [CUBLAS_WORKSPACE_CONFIG](https://docs.nvidia.com/cuda/cublas/index.html#cublasApi_reproducibility).
+
+```bash
+CUBLAS_WORKSPACE_CONFIG=:4096:8 python benchmark.py --config benchmark_configs/mnist/fa.yaml
+```
+
+
+Click here to learn more about the configuration file API. 
+
+
+### Run an experiment on a Jupyter Notebook
+
+
+
+
+
+## Installation
+
+
+
+
+
 ## Benchmarks
 
-### MNIST & Fashion-MNIST
-The training set is split into a 60k training and 10k validation partitions. The model with best validation accuracy is then benchmarked with the same validation set of 10k samples. The model used to compare is LeNet MNIST.
-The Top-1 Classification Error Rate is shown in the table.
 
-| Algorithm | MNIST | Fashion MNIST |
-|-----------|-------|---------------|
-| BP        | 0.84  | 8.88          |
-| FA        | 1.91  | 12.77         |
-| uSF       | 0.83  | 9.22          |
-| brSF      | 0.79  | 9.31          |
-| frSF      | 0.92  | 9.27          |
-| DFA       | 1.71  | 12.76         |
-
-### CIFAR 10
-
-The training set is split into a 45k training and 5k validation partitions. The model with best validation accuracy is then benchmarked with the testing set of 10k samples as in [He, Kaiming, et al.](https://arxiv.org/abs/1512.03385). 
-The models used to compare are LeNet CIFAR10, ResNet-20 and ResNet-56. The configuration files attached contain the exact hyperparameters used per method. 
-The Top-1 Classification Error Rate is shown in the table.
-
-| Algorithm | LeNet | LeNet (Adam) | ResNet-20 | ResNet-20 (Adam) | ResNet-56 (Adam) |
-|-----------|-------|--------------|-----------|------------------|------------------|
-| BP        | 14.52 | 16.37        | 9.42      | 10.27            | 7.91             |
-| FA        | 44.15 | 36.35        | 36.38     | 29.16            | 33.04            |
-| uSF       | 16.81 | 16.34        | 15.01     | 10.56            | 10.59            |
-| brSF      | 17.08 | 17.12        | 14.95     | 11.24            | 13.52            |
-| frSF      | 16.95 | 16.58        | 16.94     | 11.29            | 11.5             |
-| DFA       | 52.7  | 36.29        | 39.35     | 37.7             | 35.44            |
-
-
-### ImageNet
 
