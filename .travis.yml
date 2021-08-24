@@ -10,4 +10,4 @@ before_install:
 
 
 script:
-  - ". venv/bin/activate && script/circle_test"
+  - ". script/circle_test"
