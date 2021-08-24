@@ -3,7 +3,7 @@
 </h3>
 
 <h3 align="center">
-    <p>BioTorch is a PyTorch framework specialized in biologically plausible learning algorithms</p>
+    <p>BioTorch is a PyTorch framework specialized in biologically plausible learning methods</p>
 </h3>
 
 ---
