@@ -3,31 +3,24 @@ jobs:
   test:
     docker:
       - image: python:3.8
-    resource_class: small
     steps:
-      - run: pip install virtualenv
       - checkout
-      - add_ssh_keys
       - restore_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "setup.py" }}
-      - run:
-          command: script/setup
+          keys:
+            - biotorch-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
+            - biotorch-
+      - run: |
+          python -m venv venv
+          . venv/bin/activate
+          pip install --upgrade pip
+          pip install --upgrade -r requirements.txt
       - save_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "setup.py" }}
+          key: biotorch-{{ checksum "setup.py" }}-{{ checksum "requirements.txt" }}
           paths:
-            - ".venv"
+            - venv
       - run:
           name: Run tests
-          command: |
-            . script/env
-            set -e
-            cp -f .circleci/resources/pytest_build_config.ini pytest.ini
-            shopt -s globstar
-            TESTFILES=$(circleci tests glob tests/**/test*.py)
-            mkdir -p test-results
-            shopt -u globstar
-            pytest --junitxml=test-results/junit.xml $TESTFILES
-            flake8 --max-line-length 50000 biotorch tests
+          command: . venv/bin/activate && script/circle_test
           no_output_timeout: 1h
       - store_test_results:
           path: test-results
