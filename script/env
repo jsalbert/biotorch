@@ -5,4 +5,5 @@ if [ -z $CI ]; then
     virtualenv .venv -p python3
   fi
   source $VENV_DIR/bin/activate
+  echo $VENV_DIR
 fi

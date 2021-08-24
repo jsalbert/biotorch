@@ -9,4 +9,5 @@ before_install:
   - script/setup
 
 script:
+  - source .venv/bin/activate
   - script/test
