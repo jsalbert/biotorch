@@ -19,7 +19,6 @@ setup(
     url='https://github.com/jsalbert/biotorch',
     packages=find_packages(exclude=['tests', '.cache', '.venv', '.git', 'dist']),
     install_requires=[
-        "setuptools",
         "torch>=1.0",
         "torchvision",
         "flake8",
@@ -35,7 +34,7 @@ setup(
         "Pillow",
         "pytest",
         "pytest-cov",
-        "PyYAML",
+        "pyyaml",
         "scipy",
         "tensorboard",
         "torchattacks",
