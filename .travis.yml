@@ -5,9 +5,9 @@ python:
   - "3.6"
 
 before_install:
-  - "export PYTHONPATH=$PYTHONPATH:$(pwd)"
-  - script/setup
+  - "python setup.py install"
+  - script/travis_setup
+
 
 script:
-  - source .venv/bin/activate
-  - script/test
+  - ". venv/bin/activate && script/circle_test"

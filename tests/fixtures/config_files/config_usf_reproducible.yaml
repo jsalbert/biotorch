@@ -48,8 +48,8 @@ training:
   metrics:
     top_k: 5
     display_iterations: 500
-    layer_alignment: true
-    weight_ratio: true
+    layer_alignment: false
+    weight_ratio: false
 
 # Infrastructure
 infrastructure:
