@@ -7,8 +7,9 @@
 </h3>
 
 ---
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![Build Status](https://app.travis-ci.com/jsalbert/biotorch.svg?token=961VyHzz93LuqWShsXDX&branch=main)](https://app.travis-ci.com/jsalbert/biotorch)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
 
 BioTorch Provides:
 
