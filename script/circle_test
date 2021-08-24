@@ -4,4 +4,4 @@ set -e
 
 # Run tests and lint checks.
 PYTHONPATH="." pytest -s -v $ARGS
-flake8 --max-line-length 50000 biotorch tests
+# flake8 --max-line-length 50000 biotorch tests

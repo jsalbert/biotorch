@@ -31,7 +31,7 @@ model:
 # Training Parameters
 training:
   hyperparameters:
-    epochs: 2
+    epochs: 1
     batch_size: 100
 
   optimizer:

@@ -31,7 +31,7 @@ model:
 # Training Parameters
 training:
   hyperparameters:
-    epochs: 2
+    epochs: 1
     batch_size: 100
 
   optimizer:
@@ -43,7 +43,7 @@ training:
   lr_scheduler:
     type: "multistep_lr"
     gamma: 0.5
-    milestones: [1]
+    milestones: [0]
 
   metrics:
     top_k: 5

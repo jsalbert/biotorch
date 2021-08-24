@@ -1,7 +1,9 @@
 import os
 import subprocess
 import pandas as pd
+from unittest import mock
 from biotorch.benchmark.run import Benchmark
+from biotorch.datasets.mnist import MNIST
 
 
 def test_benchmark(config_bp_path):

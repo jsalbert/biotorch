@@ -5,9 +5,9 @@ import biotorch.models as models
 def check_model(model, input_size):
     model_ = model()
     if 'mode' in model_.__dict__ and model_.mode == 'dfa':
-        out = model_.forward(torch.rand(input_size), targets=torch.LongTensor([1]), loss_function=torch.nn.CrossEntropyLoss())
+        _ = model_.forward(torch.rand(input_size), targets=torch.LongTensor([1]), loss_function=torch.nn.CrossEntropyLoss())
     else:
-        out = model_(torch.rand(input_size))
+        _ = model_(torch.rand(input_size))
 
 
 def test_backpropagation_models(model_architectures):
