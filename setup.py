@@ -13,7 +13,7 @@ setup(
     packages=find_packages(exclude=['tests', '.cache', '.venv', '.git', 'dist']),
     scripts=[],
     install_requires=[
-        "setuptools"
+        "setuptools",
         "torch>=1.0",
         "torchvision",
         "flake8",
