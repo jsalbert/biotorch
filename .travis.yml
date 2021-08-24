@@ -8,6 +8,13 @@ before_install:
   - "python setup.py install"
   - script/travis_setup
 
-
 script:
-  - ". script/circle_test"
+  - script/travis_test
+
+jobs:
+  include:
+    - stage: distribute
+      if: branch = master AND type != pull_request
+      install: skip
+      script:
+        - script/distribute
