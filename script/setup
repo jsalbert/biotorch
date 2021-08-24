@@ -2,4 +2,4 @@
 . script/env
 
 pip install --upgrade pip
-python setup.py
+python setup.py sdist
