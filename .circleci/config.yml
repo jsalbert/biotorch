@@ -38,4 +38,4 @@ workflows:
   version: 2
   test_package:
     jobs:
-      - test:
+      - test
