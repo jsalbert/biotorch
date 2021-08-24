@@ -5,7 +5,7 @@ set -e
 
 # Run tests, lint checks, and save results.
 mkdir -p test-results
-PYTHONPATH="." pytest -v --cov=./ $ARGS
+PYTHONPATH="." pytest --cov=./ $ARGS --junitxml=test-results/junit.xml
 
 flake8 --max-line-length 50000 biotorch tests
 
