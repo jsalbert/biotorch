@@ -1,0 +1,41 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: python:3.8
+    resource_class: small
+    steps:
+      - run: pip install virtualenv
+      - checkout
+      - add_ssh_keys
+      - restore_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "setup.py" }}
+      - run:
+          command: script/setup
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "setup.py" }}
+          paths:
+            - ".venv"
+      - run:
+          name: Run tests
+          command: |
+            . script/env
+            set -e
+            cp -f .circleci/resources/pytest_build_config.ini pytest.ini
+            shopt -s globstar
+            TESTFILES=$(circleci tests glob tests/**/test*.py)
+            mkdir -p test-results
+            shopt -u globstar
+            pytest --junitxml=test-results/junit.xml $TESTFILES
+            flake8 --max-line-length 50000 biotorch tests
+          no_output_timeout: 1h
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+
+workflows:
+  version: 2
+  test_package:
+    jobs:
+      - test:
