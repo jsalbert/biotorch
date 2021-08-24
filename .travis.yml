@@ -9,11 +9,3 @@ before_install:
 
 script:
   - script/travis_test
-
-jobs:
-  include:
-    - stage: distribute
-      if: branch = main AND type != pull_request
-      install: skip
-      script:
-        - script/distribute
