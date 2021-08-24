@@ -1,12 +1,12 @@
 import os
+import pytest
 import subprocess
 import pandas as pd
-from unittest import mock
 from biotorch.benchmark.run import Benchmark
 from biotorch.datasets.mnist import MNIST
 
 
-@pytest.skip(reason="We need to mock the dataset")
+@pytest.mark.skip(reason="We need to mock the dataset")
 def test_benchmark(config_bp_path):
     benchmark = Benchmark(config_bp_path)
     benchmark.run()
