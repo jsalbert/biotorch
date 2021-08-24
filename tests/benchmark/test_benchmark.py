@@ -6,6 +6,7 @@ from biotorch.benchmark.run import Benchmark
 from biotorch.datasets.mnist import MNIST
 
 
+@pytest.skip(reason="We need to mock the dataset")
 def test_benchmark(config_bp_path):
     benchmark = Benchmark(config_bp_path)
     benchmark.run()
