@@ -36,7 +36,7 @@ def resnet20(pretrained: bool = False, progress: bool = True, num_classes: int =
 
 
 def resnet32(pretrained: bool = False, progress: bool = True, num_classes: int = 10, layer_config=None) -> ResNet:
-    r"""ResNet-20 model from
+    r"""ResNet-32 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_.
 
     Args:
@@ -44,7 +44,7 @@ def resnet32(pretrained: bool = False, progress: bool = True, num_classes: int =
         progress (bool): If True, displays a progress bar of the download to stderr
         num_classes (int): Output dimension of the last linear layer
     """
-    print('Converting ResNet-20 to {} mode'.format(MODE_STRING))
+    print('Converting ResNet-32 to {} mode'.format(MODE_STRING))
     return create_resnet_biomodel(small_resnet.resnet32, MODE, layer_config, pretrained, progress, num_classes)
 
 
