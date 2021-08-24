@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 . script/env
-set -x
+
 pip install --upgrade pip
 pip install -r requirements.txt
 python setup.py sdist
