@@ -1,2 +1,4 @@
-from biotorch.models.backpropagation.resnet import *
-from biotorch.models.backpropagation.le_net import *
+from .alexnet import *
+from .densenet import *
+from .le_net import *
+from .resnet import *

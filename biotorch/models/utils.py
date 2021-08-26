@@ -3,12 +3,12 @@ import torch.nn as nn
 from biotorch.module.biomodule import BioModule
 
 
-def create_resnet_biomodel(model_architecture,
-                           mode,
-                           layer_config: dict = None,
-                           pretrained: bool = False,
-                           progress: bool = True,
-                           num_classes: int = 1000) -> BioModule:
+def create_torchvision_biomodel(model_architecture,
+                                mode,
+                                layer_config: dict = None,
+                                pretrained: bool = False,
+                                progress: bool = True,
+                                num_classes: int = 1000) -> BioModule:
     if not pretrained:
         copy_weights = False
         model = model_architecture(pretrained, progress, num_classes=num_classes)
