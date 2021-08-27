@@ -1,8 +1,0 @@
-model: 'resnet18'
-dataset: 'cifar10'
-
-optimizer:
-  'type': 'RMSProp'
-  'lr': 0.1
-
-
