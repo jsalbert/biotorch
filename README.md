@@ -13,11 +13,11 @@
 
 BioTorch Provides:
 
-🧠 Implementations of layers, models and biologically plausible learning algorithms. It allows to load existing state-of-the-art models, easy creation of custom models and automatic conversion of any existing model.
+🧠 &nbsp; Implementations of layers, models and biologically plausible learning algorithms. It allows to load existing state-of-the-art models, easy creation of custom models and automatic conversion of any existing model.
 
-🧠 A framework to train, evaluate and benchmark different biologically plausible learning algorithms in a selection of datasets. It is focused on the principles of PyTorch design and research reproducibility. Configuration files that include the choice of a fixed seed and deterministic math and CUDA operations are provided. 
+🧠 &nbsp; A framework to train, evaluate and benchmark different biologically plausible learning algorithms in a selection of datasets. It is focused on the principles of PyTorch design and research reproducibility. Configuration files that include the choice of a fixed seed and deterministic math and CUDA operations are provided. 
 
-🧠 A place of colaboration, ideas sharing and discussion.  
+🧠 &nbsp; A place of colaboration, ideas sharing and discussion.  
 
 ## Methods Supported
 
