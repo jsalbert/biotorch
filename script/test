@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+. script/env
+ARGS="${@:-tests/}"
+set -e
+
+# Run tests, lint checks, and save results.
+mkdir -p test-results
+PYTHONPATH="." pytest --cov=./ $ARGS --junitxml=test-results/junit.xml
+
+flake8 --max-line-length 50000 biotorch tests
+
+# Upload coverage for CI.
+if [ -n "$CI" ]; then
+  pip install codecov
+  codecov
+fi

@@ -1,0 +1,59 @@
+# Experiment Information
+experiment:
+  name: "frsf_adam"
+  output_dir: "trained_models/cifar10/resnet20/"
+  # For reproducibility
+  seed: 2021
+  deterministic: true
+
+# Dataset
+data:
+  dataset: "cifar10_benchmark"
+  dataset_path: null
+  target_size: 32
+  num_workers: 0
+
+# Model
+model:
+  architecture: "resnet20"
+  mode:
+    type: "frsf"
+    options:
+      constrain_weights: false
+      init: "xavier"
+      gradient_clip: false
+
+  pretrained: false
+  # checkpoint:
+  loss_function:
+    name: "cross_entropy"
+
+# Training Parameters
+training:
+  hyperparameters:
+    epochs: 250
+    batch_size: 128
+
+  optimizer:
+    type: "Adam"
+    lr: 0.001
+    weight_decay: 0.0001
+    momentum: 0.9
+    betas: [0.9, 0.999]
+
+  lr_scheduler:
+    type: "multistep_lr"
+    gamma: 0.1
+    milestones: [100, 150, 200]
+
+  metrics:
+    top_k: 5
+    display_iterations: 500
+    layer_alignment: true
+    weight_ratio: true
+
+# Infrastructure
+infrastructure:
+  gpus: 0
+
+evaluation: true
