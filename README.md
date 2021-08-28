@@ -107,6 +107,8 @@ pip install biotorch
 Or from source:
 
 ```bash
+git clone https://github.com/jsalbert/biotorch.git
+cd biotorch
 script/setup
 ```
 
