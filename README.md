@@ -107,7 +107,7 @@ pip install biotorch
 Or from source:
 
 ```bash
-python setup.py install
+script/setup
 ```
 
 
