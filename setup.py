@@ -10,8 +10,8 @@ README = (ROOT/"README.md").read_text()
 
 setup(
     name='biotorch',
-    version='0.0.4',
-    description='BioTorch is a PyTorch framework specialized in biologically plausible learning algorithms.',
+    version='0.0.2',
+    description='BioTorch is a PyTorch framework specializing in biologically plausible learning algorithms.',
     long_description=README,
     long_description_content_type="text/markdown",
     author='Albert Jimenez',
@@ -32,8 +32,6 @@ setup(
         "jupyter",
         "jsonschema",
         "Pillow",
-        "pytest",
-        "pytest-cov",
         "pyyaml",
         "scipy",
         "tensorboard",
