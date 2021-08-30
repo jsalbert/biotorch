@@ -10,7 +10,7 @@ README = (ROOT/"README.md").read_text()
 
 setup(
     name='biotorch',
-    version='0.0.3',
+    version='0.0.4',
     description='BioTorch is a PyTorch framework specializing in biologically plausible learning algorithms.',
     long_description=README,
     long_description_content_type="text/markdown",
@@ -22,10 +22,6 @@ setup(
         "jsonschema>=3.0",
         "torch>=1.0",
         "torchvision",
-        "flake8",
-        "autoflake",
-        "pep8",
-        "autopep8",
         "numpy",
         "matplotlib",
         "pandas",
