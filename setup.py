@@ -10,10 +10,11 @@ README = (ROOT/"README.md").read_text()
 
 setup(
     name='biotorch',
-    version='0.0.5',
+    version='0.0.6',
     description='BioTorch is a PyTorch framework specializing in biologically plausible learning algorithms.',
     long_description=README,
     long_description_content_type="text/markdown",
+    include_package_data=True,
     author='Albert Jimenez',
     author_email='albertjimenez@aip.ai',
     url='https://github.com/jsalbert/biotorch',
