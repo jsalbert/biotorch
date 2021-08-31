@@ -1,7 +1,7 @@
 # Experiment Information
 experiment:
   name: "fa_adam"
-  output_dir: "trained_models_final/cifar10/resnet20/"
+  output_dir: "trained_models/cifar10/resnet20/"
   # For reproducibility
   seed: 2021
   deterministic: true
