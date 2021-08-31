@@ -90,10 +90,11 @@ CUBLAS_WORKSPACE_CONFIG=:4096:8 python benchmark.py --config benchmark_configs/m
 Click [here](https://github.com/jsalbert/biotorch/blob/main/configuration_file.md) to learn more about the configuration file API. 
 
 
-### Run an experiment on a Jupyter Notebook
+### Run an experiment on a Colab Notebook
 
-
-
+[Benchmark](https://github.com/jsalbert/biotorch/blob/release/notebooks/benchmark/benchmark_with_config.ipynb)
+[Benchmark with custom model](https://github.com/jsalbert/biotorch/blob/release/notebooks/benchmark/benchmark_custom_model.ipynb)
+[Plot alignment metrics](https://github.com/jsalbert/biotorch/blob/release/notebooks/benchmark/metrics_visualizations.ipynb)
 
 
 ## Installation
