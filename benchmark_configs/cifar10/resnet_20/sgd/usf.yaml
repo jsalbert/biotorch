@@ -53,6 +53,6 @@ training:
 
 # Infrastructure
 infrastructure:
-  gpus: 1
+  gpus: 0
 
 evaluation: true
