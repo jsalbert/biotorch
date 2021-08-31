@@ -13,11 +13,11 @@
 
 BioTorch Provides:
 
-🧠 Implementations of layers, models and biologically plausible learning algorithms. It allows to load existing state-of-the-art models, easy creation of custom models and automatic conversion of any existing model.
+🧠 &nbsp; Implementations of layers, models and biologically plausible learning algorithms. It allows to load existing state-of-the-art models, easy creation of custom models and automatic conversion of any existing model.
 
-🧠 A framework to train, evaluate and benchmark different biologically plausible learning algorithms in a selection of datasets. It is focused on the principles of PyTorch design and research reproducibility. Configuration files that include the choice of a fixed seed and deterministic math and CUDA operations are provided. 
+🧠 &nbsp; A framework to train, evaluate and benchmark different biologically plausible learning algorithms in a selection of datasets. It is focused on the principles of PyTorch design and research reproducibility. Configuration files that include the choice of a fixed seed and deterministic math and CUDA operations are provided. 
 
-🧠 A place of colaboration, ideas sharing and discussion.  
+🧠 &nbsp; A place of colaboration, ideas sharing and discussion.  
 
 ## Methods Supported
 
@@ -80,7 +80,7 @@ model = BioModule(module=alexnet(), mode='frsf')
 python benchmark.py --config benchmark_configs/mnist/fa.yaml
 ```
 
-If you want the experiment to be reproducible, check that you have specified a seed and the parameter `deterministic`is set to True in the configuration file yaml. That will apply all the [PyTorch reproducibility steps](https://pytorch.org/docs/stable/notes/randomness.html). 
+If you want the experiment to be reproducible, check that you have specified a seed and the parameter `deterministic`is set to true in the configuration file yaml. That will apply all the [PyTorch reproducibility steps](https://pytorch.org/docs/stable/notes/randomness.html). 
 If you are running your experiment on GPU add the extra environment variable [CUBLAS_WORKSPACE_CONFIG](https://docs.nvidia.com/cuda/cublas/index.html#cublasApi_reproducibility).
 
 ```bash
@@ -90,10 +90,13 @@ CUBLAS_WORKSPACE_CONFIG=:4096:8 python benchmark.py --config benchmark_configs/m
 Click [here](https://github.com/jsalbert/biotorch/blob/main/configuration_file.md) to learn more about the configuration file API. 
 
 
-### Run an experiment on a Jupyter Notebook
+### Run an experiment on a Colab Notebook
 
+- [Benchmark with configuration file](https://github.com/jsalbert/biotorch/blob/release/notebooks/benchmark/benchmark_with_config.ipynb)
 
+- [Benchmark with custom model](https://github.com/jsalbert/biotorch/blob/release/notebooks/benchmark/benchmark_custom_model.ipynb)
 
+- [Plot alignment metrics](https://github.com/jsalbert/biotorch/blob/release/notebooks/benchmark/metrics_visualizations.ipynb)
 
 
 ## Installation
@@ -107,7 +110,9 @@ pip install biotorch
 Or from source:
 
 ```bash
-python setup.py install
+git clone https://github.com/jsalbert/biotorch.git
+cd biotorch
+script/setup
 ```
 
 
