@@ -1,0 +1,19 @@
+language: python
+
+python:
+  - "3.8"
+
+before_install:
+  - "python setup.py install"
+  - script/travis_setup
+
+script:
+  - script/travis_test
+
+deploy:
+  provider: pypi
+  username: "__token__"
+  password:
+    secure: PdbE2xGE4s/ElkOhxZbA9IxQo2OkZcg9fD1L6ddpJOOjUyUfVApLHRNECxKaeJKwxLK68JEDIH54po7ktEzClPce22APcZK+1Oc9fDaP9yQYtKLdUoqVjtT9BxD8xkTMzKf1ucBg3uHYiCIP9U1HcloxU6frkZzpPQ8QSebdnUP2N2N02aFe0aLCTAvJalq11iEvB/ndrymzVakYWmf/2p8EjZBMpRLm2panYE713OQnahmto4BxY150NUhGxTN5M43thot1g8rEMmV+tMSwz9Va0G3qn0Sv5gPuid4Pnbk23bYRN4XZ2cfB3dLqxfj4V5t43aErROpeszwjBqb4mFSMcYsSx1OulN7Mq7Cy1WSVVy5FmYTlqIHmF45MMBPxnVoX002OyoFWwRGiJkoxKh9rIyqwZETUzUXvsI89D6zg/fnNssyFGhiWEHmGb92O8/MwotvlVilG9gAbzvRNdk5eZKem0uMjk1jzfFf5WFiV2xJIs0agtuYI6n++YPHxZ0BgOXYpwI73Eqq3lud40toQKoLrPERJh65fGIC4FTxCk8W+sVsyErMZdmQoASoGv9kHp6xdfx02TSXZCNzPvaQPS8BNhuyD1SfIGbrDXsNYQad3Lgb1ZmreFCKgbAbndEDcAM6L6p5NHvK/jwJImRzjrXibEbPyDdkPk8xZyCQ=
+  on:
+    branch: main

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+VENV_DIR=".venv"
+if [ -z $NO_VENV ]; then
+  if [ ! -d $VENV_DIR ]; then
+    virtualenv .venv
+  fi
+  . $VENV_DIR/bin/activate
+fi

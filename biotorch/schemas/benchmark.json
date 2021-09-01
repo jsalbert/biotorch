@@ -1,0 +1,339 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Biotorch Benchmark's Schema",
+  "type": "object",
+  "properties": {
+    "experiment": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "output_dir": {
+          "type": "string"
+        },
+        "seed": {
+          "type": "integer",
+          "default": 1
+        },
+        "deterministic": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "output_dir"
+      ]
+    },
+    "infrastructure": {
+      "type": "object",
+      "properties": {
+        "gpus": {
+          "type": ["integer", "array"]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "gpus"
+      ]
+    }
+  },
+  "data": {
+    "type": "object",
+    "properties": {
+      "dataset": {
+        "type": "string"
+      },
+      "dataset_path": {
+        "type": "string"
+      },
+      "target_size": {
+            "type": "integer"
+          },
+      "batch_size": {
+            "type": "integer",
+            "default": 32
+          },
+      "num_workers": {
+            "type": "integer",
+            "default": 0
+          }
+      },
+    "additionalProperties": false,
+    "required": [
+      "dataset",
+      "target_size"
+    ]
+  },
+  "training": {
+    "type": "object",
+    "properties": {
+      "hyperparameters": {
+        "type": "object",
+        "properties": {
+          "num_epochs": {
+            "type": "integer"
+          },
+          "batch_size": {
+            "type": "integer",
+            "default": 32
+          }
+        },
+        "additionalProperties": false,
+        "required": "num_epochs"
+      },
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ]
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "top_k": {
+          "type": "integer",
+          "default": 5
+        },
+        "layer_alignment": {
+          "type": "boolean",
+          "default": true
+        },
+        "weight_ratio": {
+          "type": "boolean",
+          "default": false
+        },
+        "display_iterations": {
+          "type": "integer",
+          "default": 500
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "top_k",
+        "display_iterations",
+        "weight_ratio",
+        "layer_alignment"
+      ]
+    },
+    "optimizer": {
+      "type": "object",
+      "properties": {
+        "SGD": {
+          "type": "object",
+          "properties": {
+            "lr": {
+              "type": "number",
+              "default": 0.001
+            },
+            "weight_decay": {
+              "type": "number",
+              "default": 0.0
+            },
+            "momentum": {
+              "type": "number",
+              "default": 0.9
+            },
+            "gamma": {
+              "type": "number",
+              "default": 0.5
+            },
+            "scheduler_frequency": {
+              "type": "array",
+              "default": []
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "lr",
+            "weight_decay",
+            "momentum"
+          ],
+          "default": {}
+        },
+        "Adam": {
+          "type": "object",
+          "properties": {
+            "lr": {
+              "type": "number",
+              "default": 0.01
+            },
+            "betas": {
+              "type": "array",
+              "default": [0.9, 0.999]
+            },
+            "epsilon": {
+              "type": "number",
+              "default": 0.0
+            },
+            "weight_decay": {
+              "type": "number",
+              "default": 0.0
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "lr",
+            "betas",
+            "epsilon",
+            "weight_decay"
+          ]
+        },
+        "RMSProp": {
+          "type": "object",
+          "properties": {
+            "lr": {
+              "type": "number",
+              "default": 0.01
+            },
+            "epsilon": {
+              "type": "number",
+              "default": 0.0
+            },
+            "weight_decay": {
+              "type": "number",
+              "default": 0.0
+            },
+            "momentum": {
+              "type": "number",
+              "default": 0.9
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "lr",
+            "momentum",
+            "epsilon",
+            "weight_decay"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "SGD"
+          ]
+        },
+        {
+          "type": "object",
+          "required": [
+            "Adam"
+          ]
+        }
+      ]
+    },
+    "additionalProperties": false,
+    "required": [
+      "hyperparameters",
+      "metrics"
+    ]
+  },
+  "model": {
+    "type": "object",
+    "properties": {
+      "mode": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+                "backpropagation",
+                "fa",
+                "dfa",
+                "usf",
+                "brsf",
+                "frsf"
+              ]
+          },
+          "options": {
+            "type": "object",
+            "properties": {
+              "constrain_weights": {
+                "type": "boolean",
+                "default": false
+              },
+              "scaling_factor": {
+                "type": "boolean",
+                "default": false
+              },
+              "gradient_clip": {
+                "type": "boolean",
+                "default": false
+              }
+            }
+          }
+        }
+      },
+      "pretrained": {
+        "type": "boolean",
+        "default": false
+      },
+      "loss_function": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "default": "cross_entropy"
+          }
+        }
+      },
+      "architecture": {
+        "type": "string",
+        "enum": [
+          "alexnet",
+          "densenet121",
+          "densenet161",
+          "densenet169",
+          "densenet201",
+          "resnet101",
+          "resnet152",
+          "resnet18",
+          "resnet34",
+          "resnet50",
+          "resnet20",
+          "squeezenet1_0",
+          "squeezenet1_1",
+          "vgg11",
+          "vgg11_bn",
+          "vgg13",
+          "vgg13_bn",
+          "vgg16",
+          "vgg16_bn",
+          "vgg19",
+          "vgg19_bn"
+        ]
+      },
+      "model_checkpoint": {
+        "type": "string",
+        "default": null
+      },
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "model_checkpoint"
+          ]
+        },
+        {
+          "required": [
+            "architecture"
+          ]
+        }
+      ]
+    },
+    "additionalProperties": false,
+    "required": [
+      "experiment",
+      "infrastructure",
+      "model",
+      "data"
+    ]
+  }
+}
+

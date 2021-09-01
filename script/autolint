@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+. script/env
+set -xe
+autopep8 --in-place --recursive --max-line-length 1000 --aggressive tests biotorch

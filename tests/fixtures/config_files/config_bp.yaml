@@ -1,0 +1,58 @@
+# Experiment Information
+experiment:
+  name: "backpropagation_test"
+  output_dir: "tests/tmp/mnist/le_net/"
+  # For reproducibility
+  seed: 2021
+  deterministic: true
+
+# Dataset
+data:
+  dataset: "mnist"
+  dataset_path: null
+  target_size: 32
+  num_workers: 0
+
+# Model
+model:
+  architecture: "le_net_mnist"
+  mode:
+    type: "backpropagation"
+    options:
+      constrain_weights: false
+      gradient_clip: false
+      init: "xavier"
+
+  pretrained: false
+  # checkpoint:
+  loss_function:
+    name: "cross_entropy"
+
+# Training Parameters
+training:
+  hyperparameters:
+    epochs: 1
+    batch_size: 100
+
+  optimizer:
+    type: "SGD"
+    lr: 0.001
+    weight_decay: 0.001
+    momentum: 0.9
+
+  lr_scheduler:
+    type: "multistep_lr"
+    gamma: 0.5
+    milestones: [1]
+
+  metrics:
+    top_k: 5
+    display_iterations: 500
+    layer_alignment: true
+    weight_ratio: true
+
+# Infrastructure
+infrastructure:
+  gpus: -1
+
+evaluation: true
