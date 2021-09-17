@@ -33,7 +33,7 @@ BioTorch Provides:
 
 Layer Weight Alignment            |  Layer Weight Norm Ratio
 :-------------------------:|:-------------------------:
-![](https://github.com/jsalbert/biotorch/blob/main/figures/fa_angles_resnet_56_adam.png)  |  ![](https://github.com/jsalbert/biotorch/blob/main/figures/fa_weights_resnet_56_adam.png)
+![angles_adam](https://github.com/jsalbert/biotorch/blob/main/figures/fa_angles_resnet_56_adam.png?raw=true)  |  ![weight_norm](https://github.com/jsalbert/biotorch/blob/main/figures/fa_weights_resnet_56_adam.png?raw=true)
 
 
 ## Quick Tour
