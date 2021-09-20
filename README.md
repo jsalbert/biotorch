@@ -92,11 +92,11 @@ Click [here](https://github.com/jsalbert/biotorch/blob/main/configuration_file.m
 
 ### Run an experiment on a Colab Notebook
 
-- [Benchmark with configuration file](https://github.com/jsalbert/biotorch/blob/release/notebooks/benchmark/benchmark_with_config.ipynb)
+- [Benchmark with configuration file](https://github.com/jsalbert/biotorch/blob/main/notebooks/accuracy_benchmark/benchmark_with_config.ipynb)
 
-- [Benchmark with custom model](https://github.com/jsalbert/biotorch/blob/release/notebooks/benchmark/benchmark_custom_model.ipynb)
+- [Benchmark with custom model](https://github.com/jsalbert/biotorch/blob/main/notebooks/accuracy_benchmark/benchmark_custom_model.ipynb)
 
-- [Plot alignment metrics](https://github.com/jsalbert/biotorch/blob/release/notebooks/benchmark/metrics_visualizations.ipynb)
+- [Plot alignment metrics](https://github.com/jsalbert/biotorch/blob/main/notebooks/accuracy_benchmark/metrics_visualizations.ipynb)
 
 
 ## Installation
